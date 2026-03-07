@@ -196,11 +196,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getGenreClass(genreStr) {
         if (!genreStr) return 'genre-drama';
         const g = genreStr.toLowerCase();
-        if (g.includes('sci-fi') || g.includes('fantasy') || g.includes('alien') || g.includes('space') || g.includes('superhero')) return 'genre-scifi';
-        if (g.includes('action') || g.includes('adventure') || g.includes('war') || g.includes('spy') || g.includes('disaster')) return 'genre-action';
-        if (g.includes('horror') || g.includes('thriller') || g.includes('vampire') || g.includes('zombie')) return 'genre-horror';
-        if (g.includes('comedy') || g.includes('musical') || g.includes('satire') || g.includes('animation')) return 'genre-comedy';
-        return 'genre-drama';
+        if (g.includes('sci-fi') || g.includes('fantasy') || g.includes('alien') || g.includes('space') || g.includes('superhero')) return 'scifi';
+        if (g.includes('action') || g.includes('adventure') || g.includes('war') || g.includes('spy') || g.includes('disaster')) return 'action';
+        if (g.includes('horror') || g.includes('thriller') || g.includes('vampire') || g.includes('zombie')) return 'horror';
+        if (g.includes('comedy') || g.includes('musical') || g.includes('satire') || g.includes('animation')) return 'comedy';
+        return 'drama';
     }
 
     function createMovieCardElement(movie) {
@@ -215,10 +215,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (decade < 1920) decade = 1920;
             if (decade > 2020) decade = 2020;
 
-            card.style.setProperty('--exact-bg', `url('assets/${safeGenreFolder}/${decade}/bg.png')`);
+            card.style.setProperty('--exact-bg', `url('assets/${genreClass}/${decade}/bg.png')`);
         }
 
-        card.className = `movie-card ${genreClass}`;
+        card.className = `movie-card genre-${genreClass}`;
 
         card.innerHTML = `
             <div class="category-indicator"></div>
