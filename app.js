@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const yearList = document.getElementById('yearList');
     const rankMinInput = document.getElementById('rankMinInput');
     const rankMaxInput = document.getElementById('rankMaxInput');
+    const minCatInput = document.getElementById('minCatInput');
     const sortSelect = document.getElementById('sortSelect');
     const currentCategoryText = document.getElementById('currentCategoryText');
     const statsContainer = document.getElementById('statsContainer');
@@ -110,10 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     categoryInput.addEventListener('input', applyFilters);
     genreInput.addEventListener('input', applyFilters);
     yearMinInput.addEventListener('input', applyFilters);
-    yearMaxInput.addEventListener('input', applyFilters);
-    rankMinInput.addEventListener('input', applyFilters);
-    rankMaxInput.addEventListener('input', applyFilters);
-    sortSelect.addEventListener('change', applyFilters);
+    yearMaxInput.addEventListener('input', debouncedFilter);
+    rankMinInput.addEventListener('input', debouncedFilter);
+    rankMaxInput.addEventListener('input', debouncedFilter);
+    minCatInput.addEventListener('input', debouncedFilter);
+    sortSelect.addEventListener('change', debouncedFilter);
 
     function debounce(func, timeout = 300) {
         let timer;
@@ -196,6 +198,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
         filteredMovies = Array.from(uniqueMoviesMap.values());
+
+        // Apply Min Categories Filter
+        const minCatVal = parseInt(minCatInput.value, 10);
+        if (!isNaN(minCatVal) && minCatVal > 1) {
+            filteredMovies = filteredMovies.filter(m => m.AggregatedData && m.AggregatedData.length >= minCatVal);
+        }
 
         // Apply Sorting
         filteredMovies.sort((a, b) => {
