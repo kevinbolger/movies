@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="category-tag">${exactGenre}</div>
                 <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
                 <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
+                <p class="movie-description">${movie.Description || ''}</p>
                 <div class="movie-note">
                     <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
                     <div class="movie-stats">

@@ -28,6 +28,7 @@ try:
                 "Year": record.get("Year"),
                 "Rank": record.get("Rank"),
                 "Director": record.get("Director"),
+                "Description": record.get("Description"),
                 "Genre": record.get("Genre"),
                 "Studio": record.get("Studio"),
                 "Category": sheet

@@ -392,8 +392,19 @@ select:focus {
 .movie-director {
     color: var(--text-secondary);
     font-size: 1.05rem;
-    margin-bottom: 1.8rem;
+    margin-bottom: 0.8rem;
     font-weight: 300;
+}
+
+.movie-description {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .movie-note {
