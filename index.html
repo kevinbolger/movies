@@ -27,20 +27,24 @@
                     <input type="text" id="searchInput" placeholder="Search title or director...">
                 </div>
                 <div class="filter-group">
-                    <label for="categorySelect">Category</label>
-                    <select id="categorySelect">
-                        <option value="all">All Categories</option>
-                        <option value="Top 10 Box Office">Box Office</option>
-                        <option value="Top 10 Critically Acclaimed">Critically Acclaimed</option>
-                        <option value="Top 10 Award Winning">Award Winning</option>
-                        <option value="Top 10 Cult Classics">Cult Classics</option>
-                    </select>
+                    <label for="categoryInput">Category</label>
+                    <input type="text" id="categoryInput" list="categoryList" placeholder="All Categories">
+                    <datalist id="categoryList">
+                        <option value="Top 10 Box Office">
+                        <option value="Top 10 Critically Acclaimed">
+                        <option value="Top 10 Award Winning">
+                        <option value="Top 10 Cult Classics">
+                    </datalist>
                 </div>
                 <div class="filter-group">
-                    <label for="yearSelect">Year</label>
-                    <select id="yearSelect">
-                        <option value="all">All Years</option>
-                    </select>
+                    <label for="genreInput">Genre</label>
+                    <input type="text" id="genreInput" list="genreList" placeholder="All Genres">
+                    <datalist id="genreList"></datalist>
+                </div>
+                <div class="filter-group">
+                    <label for="yearInput">Year</label>
+                    <input type="text" id="yearInput" list="yearList" placeholder="All Years">
+                    <datalist id="yearList"></datalist>
                 </div>
                 <div class="stats" id="statsContainer">
                     <!-- Stats dynamically loaded -->
@@ -70,7 +74,7 @@
         </main>
     </div>
     <script src="data.js?v=3"></script>
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=6"></script>
 </body>
 
 </html>

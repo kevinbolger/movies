@@ -7,8 +7,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // DOM Elements
     const movieGrid = document.getElementById('movieGrid');
     const searchInput = document.getElementById('searchInput');
-    const categorySelect = document.getElementById('categorySelect');
-    const yearSelect = document.getElementById('yearSelect');
+    const categoryInput = document.getElementById('categoryInput');
+    const genreInput = document.getElementById('genreInput');
+    const genreList = document.getElementById('genreList');
+    const yearInput = document.getElementById('yearInput');
+    const yearList = document.getElementById('yearList');
     const sortSelect = document.getElementById('sortSelect');
     const currentCategoryText = document.getElementById('currentCategoryText');
     const statsContainer = document.getElementById('statsContainer');
@@ -22,13 +25,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         allMovies = ALL_MOVIES;
         filteredMovies = [...allMovies];
 
+        // Populate genres dynamically
+        const uniqueGenres = new Set();
+        allMovies.forEach(m => {
+            if (m.Genre) {
+                m.Genre.split(/[\/,;&]+/).forEach(part => {
+                    const clean = part.trim();
+                    if (clean) uniqueGenres.add(clean);
+                });
+            }
+        });
+        const sortedGenres = [...uniqueGenres].sort();
+        sortedGenres.forEach(genre => {
+            const option = document.createElement('option');
+            option.value = genre;
+            genreList.appendChild(option);
+        });
+
         // Populate years dynamically
         const years = [...new Set(allMovies.map(m => m.Year).filter(Boolean))].sort((a, b) => b - a);
         years.forEach(year => {
             const option = document.createElement('option');
             option.value = year;
-            option.textContent = year;
-            yearSelect.appendChild(option);
+            yearList.appendChild(option);
         });
 
         loading.style.display = 'none';
@@ -41,8 +60,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event Listeners for filters
     const debouncedFilter = debounce(applyFilters, 300);
     searchInput.addEventListener('input', debouncedFilter);
-    categorySelect.addEventListener('change', applyFilters);
-    yearSelect.addEventListener('change', applyFilters);
+    categoryInput.addEventListener('input', applyFilters);
+    genreInput.addEventListener('input', applyFilters);
+    yearInput.addEventListener('input', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
 
     function debounce(func, timeout = 300) {
@@ -55,23 +75,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function applyFilters() {
         const searchTerm = searchInput.value.toLowerCase().trim();
-        const category = categorySelect.value;
-        const yearOpt = yearSelect.value;
+        const category = categoryInput.value.trim() || 'all';
+        const genreOpt = genreInput.value.trim() || 'all';
+        const yearOpt = yearInput.value.trim() || 'all';
         const sort = sortSelect.value;
 
         filteredMovies = allMovies.filter(movie => {
             const title = String(movie.Title || '').toLowerCase();
             const director = String(movie.Director || '').toLowerCase();
+            const genreStr = String(movie.Genre || '').toLowerCase();
 
-            const matchesSearch = title.includes(searchTerm) || director.includes(searchTerm);
+            const matchesSearch = title.includes(searchTerm) || director.includes(searchTerm) || genreStr.includes(searchTerm);
             const matchesCategory = category === 'all' || movie.Category === category;
+
+            let matchesGenre = true;
+            if (genreOpt !== 'all') {
+                matchesGenre = movie.Genre && movie.Genre.includes(genreOpt);
+            }
 
             let matchesYear = true;
             if (yearOpt !== 'all') {
                 matchesYear = String(movie.Year) === yearOpt;
             }
 
-            return matchesSearch && matchesCategory && matchesYear;
+            return matchesSearch && matchesCategory && matchesGenre && matchesYear;
         });
 
         // Apply Sorting
@@ -89,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Update UI Context
-        currentCategoryText.textContent = categorySelect.options[categorySelect.selectedIndex].text;
+        currentCategoryText.textContent = category === 'all' ? 'All Categories' : category;
         updateStats();
 
         // Reset grid
