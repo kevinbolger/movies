@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>Cinematic Archives | Top 10 Movies by Year</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Explore the top 10 movies by year across Box Office, Critically Acclaimed, Award Winning, and Cult Classics. A beautiful interactive database.">
+
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Filters -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>Cinematic Archives</h1>
+                <p>Top 10 Movies by Year</p>
+            </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="searchInput">Search</label>
+                    <input type="text" id="searchInput" placeholder="Search title or director...">
+                </div>
+                <div class="filter-group">
+                    <label for="categorySelect">Category</label>
+                    <select id="categorySelect">
+                        <option value="all">All Categories</option>
+                        <option value="Top 10 Box Office">Box Office</option>
+                        <option value="Top 10 Critically Acclaimed">Critically Acclaimed</option>
+                        <option value="Top 10 Award Winning">Award Winning</option>
+                        <option value="Top 10 Cult Classics">Cult Classics</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="yearSelect">Year</label>
+                    <select id="yearSelect">
+                        <option value="all">All Years</option>
+                    </select>
+                </div>
+                <div class="stats" id="statsContainer">
+                    <!-- Stats dynamically loaded -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h2 id="currentCategoryText">All Categories</h2>
+                <div class="sort-controls">
+                    <select id="sortSelect" aria-label="Sort By">
+                        <option value="year-desc">Newest First</option>
+                        <option value="year-asc">Oldest First</option>
+                        <option value="rank-asc">Rank: 1 to 10</option>
+                        <option value="rank-desc">Rank: 10 to 1</option>
+                    </select>
+                </div>
+            </header>
+
+            <div id="loading" class="loading">Loading database...</div>
+
+            <div id="movieGrid" class="movie-grid">
+                <!-- Movie cards dynamically generated -->
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
