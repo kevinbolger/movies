@@ -1,5 +1,96 @@
 document.addEventListener('DOMContentLoaded', async () => {
     let allMovies = [];
+    // Vanilla JS Multi-Select Component
+    class MultiSelect {
+        constructor(idPrefix, allOptions) {
+            this.input = document.getElementById(`${idPrefix}Input`);
+            this.container = document.getElementById(`${idPrefix}MultiSelect`);
+            this.pillsContainer = document.getElementById(`${idPrefix}Pills`);
+            this.dropdown = document.getElementById(`${idPrefix}Dropdown`);
+            
+            this.allOptions = allOptions;
+            this.selectedOptions = [];
+            
+            this.initListeners();
+        }
+        
+        initListeners() {
+            // Fuzzy search on input
+            this.input.addEventListener('input', () => {
+                this.renderDropdown();
+                applyFilters(); // Trigger fuzzy master filter
+            });
+            
+            // Show dropdown on focus
+            this.input.addEventListener('focus', () => {
+                this.container.querySelector('.ms-search-box').classList.add('focused');
+                this.renderDropdown();
+            });
+            
+            // Hide on blur (with delay for clicks)
+            this.input.addEventListener('blur', () => {
+                this.container.querySelector('.ms-search-box').classList.remove('focused');
+                setTimeout(() => this.dropdown.classList.remove('active'), 200);
+            });
+        }
+        
+        renderDropdown() {
+            const query = this.input.value.toLowerCase().trim();
+            this.dropdown.innerHTML = '';
+            
+            // Filter options based on fuzzy text, excluding already selected ones
+            const visibleOptions = this.allOptions.filter(opt => 
+                opt.toLowerCase().includes(query) && !this.selectedOptions.includes(opt)
+            );
+            
+            if (visibleOptions.length === 0) {
+                this.dropdown.classList.remove('active');
+                return;
+            }
+            
+            visibleOptions.forEach(opt => {
+                const el = document.createElement('div');
+                el.className = 'ms-option';
+                el.textContent = opt;
+                el.onclick = () => this.selectOption(opt);
+                this.dropdown.appendChild(el);
+            });
+            
+            this.dropdown.classList.add('active');
+        }
+        
+        selectOption(opt) {
+            if (!this.selectedOptions.includes(opt)) {
+                this.selectedOptions.push(opt);
+                this.renderPills();
+                
+                // Clear input text now that we have an exact pill
+                this.input.value = ''; 
+                this.dropdown.classList.remove('active');
+                applyFilters();
+            }
+        }
+        
+        removeOption(opt) {
+            this.selectedOptions = this.selectedOptions.filter(o => o !== opt);
+            this.renderPills();
+            applyFilters();
+        }
+        
+        renderPills() {
+            this.pillsContainer.innerHTML = '';
+            this.selectedOptions.forEach(opt => {
+                const pill = document.createElement('div');
+                pill.className = 'ms-pill';
+                pill.innerHTML = `
+                    <span>${opt}</span>
+                    <span class="ms-pill-close">×</span>
+                `;
+                pill.querySelector('.ms-pill-close').onclick = () => this.removeOption(opt);
+                this.pillsContainer.appendChild(pill);
+            });
+        }
+    }
     let filteredMovies = [];
     let currentlyDisplayed = 0;
     const LOAD_CHUNK = 100; // How many to render at once
@@ -358,94 +449,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         return statsHtml;
     }
 
-    // Vanilla JS Multi-Select Component
-    class MultiSelect {
-        constructor(idPrefix, allOptions) {
-            this.input = document.getElementById(`${idPrefix}Input`);
-            this.container = document.getElementById(`${idPrefix}MultiSelect`);
-            this.pillsContainer = document.getElementById(`${idPrefix}Pills`);
-            this.dropdown = document.getElementById(`${idPrefix}Dropdown`);
-
-            this.allOptions = allOptions;
-            this.selectedOptions = [];
-
-            this.initListeners();
-        }
-
-        initListeners() {
-            // Fuzzy search on input
-            this.input.addEventListener('input', () => {
-                this.renderDropdown();
-                applyFilters(); // Trigger fuzzy master filter
-            });
-
-            // Show dropdown on focus
-            this.input.addEventListener('focus', () => {
-                this.container.querySelector('.ms-search-box').classList.add('focused');
-                this.renderDropdown();
-            });
-
-            // Hide on blur (with delay for clicks)
-            this.input.addEventListener('blur', () => {
-                this.container.querySelector('.ms-search-box').classList.remove('focused');
-                setTimeout(() => this.dropdown.classList.remove('active'), 200);
-            });
-        }
-
-        renderDropdown() {
-            const query = this.input.value.toLowerCase().trim();
-            this.dropdown.innerHTML = '';
-
-            // Filter options based on fuzzy text, excluding already selected ones
-            const visibleOptions = this.allOptions.filter(opt =>
-                opt.toLowerCase().includes(query) && !this.selectedOptions.includes(opt)
-            );
-
-            if (visibleOptions.length === 0) {
-                this.dropdown.classList.remove('active');
-                return;
-            }
-
-            visibleOptions.forEach(opt => {
-                const el = document.createElement('div');
-                el.className = 'ms-option';
-                el.textContent = opt;
-                el.onclick = () => this.selectOption(opt);
-                this.dropdown.appendChild(el);
-            });
-
-            this.dropdown.classList.add('active');
-        }
-
-        selectOption(opt) {
-            if (!this.selectedOptions.includes(opt)) {
-                this.selectedOptions.push(opt);
-                this.renderPills();
-
-                // Clear input text now that we have an exact pill
-                this.input.value = '';
-                this.dropdown.classList.remove('active');
-                applyFilters();
-            }
-        }
-
-        removeOption(opt) {
-            this.selectedOptions = this.selectedOptions.filter(o => o !== opt);
-            this.renderPills();
-            applyFilters();
-        }
-
-        renderPills() {
-            this.pillsContainer.innerHTML = '';
-            this.selectedOptions.forEach(opt => {
-                const pill = document.createElement('div');
-                pill.className = 'ms-pill';
-                pill.innerHTML = `
-                    <span>${opt}</span>
-                    <span class="ms-pill-close">×</span>
-                `;
-                pill.querySelector('.ms-pill-close').onclick = () => this.removeOption(opt);
-                this.pillsContainer.appendChild(pill);
-            });
-        }
-    });
+});
