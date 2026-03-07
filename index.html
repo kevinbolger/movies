@@ -32,13 +32,23 @@
                 </div>
                 <div class="filter-group">
                     <label for="categoryInput">Category</label>
-                    <input type="text" id="categoryInput" list="categoryList" placeholder="All Categories">
-                    <datalist id="categoryList"></datalist>
+                    <div class="ms-container" id="categoryMultiSelect">
+                        <div class="ms-search-box">
+                            <div class="ms-pills" id="categoryPills"></div>
+                            <input type="text" id="categoryInput" placeholder="All Categories" autocomplete="off">
+                        </div>
+                        <div class="ms-dropdown" id="categoryDropdown"></div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label for="genreInput">Genre</label>
-                    <input type="text" id="genreInput" list="genreList" placeholder="All Genres">
-                    <datalist id="genreList"></datalist>
+                    <div class="ms-container" id="genreMultiSelect">
+                        <div class="ms-search-box">
+                            <div class="ms-pills" id="genrePills"></div>
+                            <input type="text" id="genreInput" placeholder="All Genres" autocomplete="off">
+                        </div>
+                        <div class="ms-dropdown" id="genreDropdown"></div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label>Year Range</label>
@@ -97,7 +107,7 @@
     </div>
 
     <script src="data.js?v=5"></script>
-    <script src="app.js?v=16"></script>
+    <script src="app.js?v=17"></script>
 </body>
 
 </html>
