@@ -172,6 +172,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             return matchesTitle && matchesDirector && matchesCategory && matchesGenre && matchesYear && matchesRank;
         });
 
+        // Deduplicate movies by Title, grouping their Categories and Metrics
+        const uniqueMoviesMap = new Map();
+        filteredMovies.forEach(movie => {
+            const t = movie.Title.toLowerCase();
+            if (!uniqueMoviesMap.has(t)) {
+                uniqueMoviesMap.set(t, {
+                    ...movie,
+                    AggregatedData: [{
+                        Category: movie.Category,
+                        Rank: movie.Rank,
+                        Color: movie.Color,
+                        Metrics: movie.Metrics
+                    }]
+                });
+            } else {
+                uniqueMoviesMap.get(t).AggregatedData.push({
+                    Category: movie.Category,
+                    Rank: movie.Rank,
+                    Color: movie.Color,
+                    Metrics: movie.Metrics
+                });
+            }
+        });
+        filteredMovies = Array.from(uniqueMoviesMap.values());
+
         // Apply Sorting
         filteredMovies.sort((a, b) => {
             const yearA = parseInt(a.Year, 10);
@@ -226,17 +251,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.style.setProperty('--exact-bg', `url('assets/${genreClass}/${decade}/bg.png')`);
         }
 
-        if (movie.Color) {
+        let isMulti = movie.AggregatedData && movie.AggregatedData.length > 1;
+        const primaryData = (movie.AggregatedData && movie.AggregatedData[0]) || movie;
+
+        if (primaryData.Color) {
             // Apply category-driven hex color if available
-            card.style.setProperty('--accent', movie.Color);
+            card.style.setProperty('--accent', primaryData.Color);
         }
 
         card.className = `movie-card genre-${genreClass}`;
 
         card.innerHTML = `
-            <div class="category-indicator" ${movie.Color ? `style="background-color: ${movie.Color}"` : ''}></div>
+            <div class="category-indicator" ${primaryData.Color ? `style="background-color: ${primaryData.Color}"` : ''}></div>
             <div class="card-header">
-                <div class="rank-badge">#${movie.Rank || '-'}</div>
+                <div class="rank-badge" ${isMulti ? 'style="font-size:0.75rem; padding: 0.3rem 0.5rem;"' : ''}>${isMulti ? 'Multi' : '#' + (primaryData.Rank || '-')}</div>
                 <div class="year-badge">${movie.Year || 'N/A'}</div>
             </div>
             <div class="category-tag">${exactGenre}</div>
@@ -244,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
             <p class="movie-description">${movie.Description || ''}</p>
             <div class="movie-note">
-                <span class="movie-note-type" ${movie.Color ? `style="color: ${movie.Color}"` : ''}>${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
+                <span class="movie-note-type" ${primaryData.Color ? `style="color: ${primaryData.Color}"` : ''}>${isMulti ? 'Multiple Categories' : (primaryData.Category ? primaryData.Category.replace('Top 10 ', '') : 'Details')}</span>
                 <div class="movie-stats">
                     ${getStatsHtml(movie)}
                 </div>
@@ -298,11 +326,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getStatsHtml(movie) {
-        if (!movie.Metrics || movie.Metrics.length === 0) return '';
+        if (!movie.AggregatedData || movie.AggregatedData.length === 0) return '';
 
         let statsHtml = '';
-        movie.Metrics.forEach(metric => {
-            statsHtml += `<div><strong>${metric.Label}:</strong> ${metric.Value}</div>`;
+        movie.AggregatedData.forEach(data => {
+            const isFirst = statsHtml === '';
+            statsHtml += `<div style="${!isFirst ? 'margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);' : ''}">`;
+            statsHtml += `<div style="color: ${data.Color || 'var(--text-secondary)'}; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem;">${data.Category ? data.Category.replace('Top 10 ', '') : 'Details'} - Rank #${data.Rank || '-'}</div>`;
+
+            if (data.Metrics && data.Metrics.length > 0) {
+                data.Metrics.forEach(metric => {
+                    statsHtml += `<div style="font-size: 0.8rem; color: #ccc;"><strong>${metric.Label}:</strong> ${metric.Value}</div>`;
+                });
+            }
+            statsHtml += `</div>`;
         });
 
         return statsHtml;
