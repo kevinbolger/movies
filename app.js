@@ -104,15 +104,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderMovies();
     }
 
-    function getGenreClass(genre) {
-        if (!genre) return '';
-        const g = genre.toLowerCase();
-        if (g.includes('action')) return 'genre-action';
-        if (g.includes('sci-fi')) return 'genre-scifi';
-        if (g.includes('drama')) return 'genre-drama';
-        if (g.includes('horror')) return 'genre-horror';
-        if (g.includes('comedy')) return 'genre-comedy';
-        return '';
+    function getGenreColor(genreStr) {
+        if (!genreStr) return 'hsl(0, 0%, 50%)';
+        let hash = 0;
+        for (let i = 0; i < genreStr.length; i++) {
+            hash = genreStr.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h = Math.abs(hash) % 360;
+        const s = 70 + (Math.abs(hash) % 20);
+        return `hsl(${h}, ${s}%, 60%)`;
+    }
+
+    function getGenreGradient(genreStr) {
+        if (!genreStr) return 'linear-gradient(135deg, #1e1e24 0%, #0a0a0f 100%)';
+        let hash = 0;
+        for (let i = 0; i < genreStr.length; i++) {
+            hash = genreStr.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h1 = Math.abs(hash) % 360;
+        const h2 = (h1 + 40) % 360;
+        const s = 60 + (Math.abs(hash) % 20);
+        return `linear-gradient(135deg, hsl(${h1}, ${s}%, 18%) 0%, hsl(${h2}, ${s}%, 28%) 100%)`;
     }
 
     function renderMovies() {
@@ -128,33 +140,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             const movie = filteredMovies[i];
             const card = document.createElement('div');
 
-            // Map the MacroGenre and Decade for the background image
-            const rawGenre = movie.MacroGenre || 'Drama';
-            const cleanGenre = rawGenre.toLowerCase();
+            // Map exact genre to fallback gradient and dynamic indicator color
+            const exactGenre = movie.Genre || 'Unknown Genre';
+            const safeGenreFolder = exactGenre.toLowerCase().replace(/[\/\\]/g, '-');
 
-            let bgImage = '';
+            const dynamicGradient = getGenreGradient(exactGenre);
+            const dynamicColor = getGenreColor(exactGenre);
+
+            let bgImageStyle = '';
             if (movie.Year) {
                 let decade = Math.floor(parseInt(movie.Year, 10) / 10) * 10;
                 if (decade < 1920) decade = 1920;
                 if (decade > 2020) decade = 2020;
-                bgImage = `style="background-image: linear-gradient(to top, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.75) 100%), url('assets/${cleanGenre}/${decade}/bg.png'); background-size: cover; background-position: center;"`;
+
+                // Stack layers: 1) Vignette overlay 2) File Image url() 3) CSS dynamic gradient (fallback)
+                bgImageStyle = `style="background-image: linear-gradient(to top, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.45) 100%), url('assets/${safeGenreFolder}/${decade}/bg.png'), ${dynamicGradient}; background-size: cover; background-position: center;"`;
+            } else {
+                bgImageStyle = `style="background-image: linear-gradient(to top, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.45) 100%), ${dynamicGradient}; background-size: cover; background-position: center;"`;
             }
 
-            card.className = `movie-card genre-${cleanGenre}`;
-
-            const genreLabel = movie.Genre || 'Unknown Genre';
+            card.className = `movie-card`;
 
             card.innerHTML = `
-                <div class="card-bg" ${bgImage}></div>
-                <div class="category-indicator"></div>
+                <div class="card-bg" ${bgImageStyle}></div>
+                <div class="category-indicator" style="background-color: ${dynamicColor}; box-shadow: 0 0 10px ${dynamicColor};"></div>
                 <div class="card-header">
                     <div class="rank-badge">#${movie.Rank || '-'}</div>
                     <div class="year-badge">${movie.Year || 'N/A'}</div>
                 </div>
-                <div class="category-tag">${genreLabel}</div>
+                <!-- Hack simple HSLA conversion by replacing hsl -> hsla and ) -> , 0.15) -->
+                <div class="category-tag" style="color: ${dynamicColor}; background: ${dynamicColor.replace('hsl', 'hsla').replace(')', ', 0.15)')};">${genreLabel}</div>
                 <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
                 <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
-                <div class="movie-note">
+                <div class="movie-note" style="border-left-color: ${dynamicColor};">
                     <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
                     <div class="movie-stats">
                         ${getStatsHtml(movie)}
