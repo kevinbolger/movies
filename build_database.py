@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 excel_file = "/Users/kevinbolger/local/projects/movies/Top_10_Movies_By_Year_All_Categories.xlsx"
-output_file = "/Users/kevinbolger/local/projects/movies/data.json"
+output_file = "/Users/kevinbolger/local/projects/movies/data.js"
 
 def clean_data(df):
     return df.replace({np.nan: None})
@@ -77,9 +77,11 @@ try:
     final_records.sort(key=lambda x: (x.get('Category', ''), int(x.get('Year', 9999)), int(x.get('Rank', 9999))))
 
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(final_records, f, indent=2, ensure_ascii=False)
+        f.write("const ALL_MOVIES = ")
+        f.write(json.dumps(final_records, indent=2, ensure_ascii=False))
+        f.write(";\n")
         
-    print(f"Successfully processed and cleaned {len(final_records)} records into unified data.json")
+    print(f"Successfully processed and cleaned {len(final_records)} records into unified data.js")
     
 except Exception as e:
     import traceback
