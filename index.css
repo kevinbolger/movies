@@ -237,8 +237,198 @@ select:focus {
     opacity: 0.8;
 }
 
+.movie-card.genre-action {
+    background-image: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), var(--exact-bg, transparent), url('images/bg_action.png');
+    background-position: center;
+    background-size: cover;
+}
+
+.movie-card.genre-action:hover {
+    background-image: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), var(--exact-bg, transparent), url('images/bg_action.png');
+}
+
+.movie-card.genre-scifi {
+    background-image: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), var(--exact-bg, transparent), url('images/bg_scifi.png');
+    background-position: center;
+    background-size: cover;
+}
+
+.movie-card.genre-scifi:hover {
+    background-image: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), var(--exact-bg, transparent), url('images/bg_scifi.png');
+}
+
+.movie-card.genre-drama {
+    background-image: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), var(--exact-bg, transparent), url('images/bg_drama.png');
+    background-position: center;
+    background-size: cover;
+}
+
+.movie-card.genre-drama:hover {
+    background-image: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), var(--exact-bg, transparent), url('images/bg_drama.png');
+}
+
+.movie-card.genre-horror {
+    background-image: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), var(--exact-bg, transparent), url('images/bg_horror.png');
+    background-position: center;
+    background-size: cover;
+}
+
+.movie-card.genre-horror:hover {
+    background-image: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), var(--exact-bg, transparent), url('images/bg_horror.png');
+}
+
+.movie-card.genre-comedy {
+    background-image: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), var(--exact-bg, transparent), url('images/bg_comedy.png');
+    background-position: center;
+    background-size: cover;
+}
+
+.movie-card.genre-comedy:hover {
+    background-image: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), var(--exact-bg, transparent), url('images/bg_comedy.png');
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.2rem;
+}
+
+.rank-badge {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.05);
+}
+
+.year-badge {
+    font-size: 1rem;
+    color: var(--accent-alt);
+    background: rgba(79, 172, 254, 0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.category-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+}
+
+.movie-card.genre-action .category-indicator {
+    background: var(--cat-action);
+    box-shadow: 0 0 15px var(--cat-action);
+}
+
+.movie-card.genre-scifi .category-indicator {
+    background: var(--cat-scifi);
+    box-shadow: 0 0 15px var(--cat-scifi);
+}
+
+.movie-card.genre-drama .category-indicator {
+    background: var(--cat-drama);
+    box-shadow: 0 0 15px var(--cat-drama);
+}
+
+.movie-card.genre-horror .category-indicator {
+    background: var(--cat-horror);
+    box-shadow: 0 0 15px var(--cat-horror);
+}
+
+.movie-card.genre-comedy .category-indicator {
+    background: var(--cat-comedy);
+    box-shadow: 0 0 15px var(--cat-comedy);
+}
+
+.movie-card.genre-action .category-tag {
+    background: rgba(74, 222, 128, 0.15);
+    color: var(--cat-action);
+}
+
+.movie-card.genre-scifi .category-tag {
+    background: rgba(192, 132, 252, 0.15);
+    color: var(--cat-scifi);
+}
+
+.movie-card.genre-drama .category-tag {
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--cat-drama);
+}
+
+.movie-card.genre-horror .category-tag {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--cat-horror);
+}
+
+.movie-card.genre-comedy .category-tag {
+    background: rgba(0, 242, 254, 0.15);
+    color: var(--cat-comedy);
+}
+
+.movie-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.movie-director {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    margin-bottom: 1.8rem;
+    font-weight: 300;
+}
+
+.movie-note {
+    margin-top: auto;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #d1d5db;
+    border-left: 3px solid var(--border);
+    transition: all 0.3s ease;
+}
+
 .movie-card:hover .movie-note {
     background: rgba(0, 0, 0, 0.5);
+}
+
+.movie-card.genre-action .movie-note {
+    border-left-color: var(--cat-action);
+}
+
+.movie-card.genre-scifi .movie-note {
+    border-left-color: var(--cat-scifi);
+}
+
+.movie-card.genre-drama .movie-note {
+    border-left-color: var(--cat-drama);
+}
+
+.movie-card.genre-horror .movie-note {
+    border-left-color: var(--cat-horror);
+}
+
+.movie-card.genre-comedy .movie-note {
+    border-left-color: var(--cat-comedy);
 }
 
 .movie-note-type {
