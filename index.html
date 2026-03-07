@@ -48,10 +48,17 @@
                 <div class="filter-group">
                     <label>Year Range</label>
                     <div class="year-range-inputs" style="display: flex; gap: 0.5rem;">
-                        <input type="text" id="yearMinInput" list="yearList" placeholder="From">
-                        <input type="text" id="yearMaxInput" list="yearList" placeholder="To">
+                        <input type="number" id="yearMinInput" list="yearList" placeholder="From">
+                        <input type="number" id="yearMaxInput" list="yearList" placeholder="To">
                     </div>
                     <datalist id="yearList"></datalist>
+                </div>
+                <div class="filter-group">
+                    <label>Rank Range (1-10)</label>
+                    <div class="rank-range-inputs" style="display: flex; gap: 0.5rem;">
+                        <input type="number" id="rankMinInput" placeholder="Min (1)" min="1" max="10">
+                        <input type="number" id="rankMaxInput" placeholder="Max (10)" min="1" max="10">
+                    </div>
                 </div>
                 <button id="luckyBtn" class="lucky-btn">🎲 I'm Feeling Lucky</button>
                 <div class="stats" id="statsContainer">
@@ -91,7 +98,7 @@
     </div>
 
     <script src="data.js?v=3"></script>
-    <script src="app.js?v=10"></script>
+    <script src="app.js?v=11"></script>
 </body>
 
 </html>

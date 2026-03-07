@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const yearMinInput = document.getElementById('yearMinInput');
     const yearMaxInput = document.getElementById('yearMaxInput');
     const yearList = document.getElementById('yearList');
+    const rankMinInput = document.getElementById('rankMinInput');
+    const rankMaxInput = document.getElementById('rankMaxInput');
     const sortSelect = document.getElementById('sortSelect');
     const currentCategoryText = document.getElementById('currentCategoryText');
     const statsContainer = document.getElementById('statsContainer');
@@ -100,6 +102,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     genreInput.addEventListener('input', applyFilters);
     yearMinInput.addEventListener('input', applyFilters);
     yearMaxInput.addEventListener('input', applyFilters);
+    rankMinInput.addEventListener('input', applyFilters);
+    rankMaxInput.addEventListener('input', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
 
     function debounce(func, timeout = 300) {
@@ -145,7 +149,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 matchesYear = false;
             }
 
-            return matchesTitle && matchesDirector && matchesCategory && matchesGenre && matchesYear;
+            let matchesRank = true;
+            const minRankVal = parseInt(rankMinInput.value, 10);
+            const maxRankVal = parseInt(rankMaxInput.value, 10);
+            if (movie.Rank) {
+                const movieRank = parseInt(movie.Rank, 10);
+                if (!isNaN(minRankVal) && movieRank < minRankVal) matchesRank = false;
+                if (!isNaN(maxRankVal) && movieRank > maxRankVal) matchesRank = false;
+            } else if (!isNaN(minRankVal) || !isNaN(maxRankVal)) {
+                matchesRank = false;
+            }
+
+            return matchesTitle && matchesDirector && matchesCategory && matchesGenre && matchesYear && matchesRank;
         });
 
         // Apply Sorting
