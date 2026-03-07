@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fetch Data
     try {
-        const response = await fetch('data.json');
-        if (!response.ok) throw new Error('File not found');
-        allMovies = await response.json();
-
+        if (typeof ALL_MOVIES === 'undefined') {
+            throw new Error('ALL_MOVIES data payload not found. Ensure data.js is loaded.');
+        }
+        allMovies = ALL_MOVIES;
         filteredMovies = [...allMovies];
 
         // Populate years dynamically
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         applyFilters();
     } catch (error) {
         console.error("Error loading data:", error);
-        loading.textContent = "Failed to load database. Please ensure data.json exists.";
+        loading.textContent = "Failed to load database. Please ensure data.js exists and is linked.";
     }
 
     // Event Listeners for filters
@@ -127,11 +127,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (let i = currentlyDisplayed; i < limit; i++) {
             const movie = filteredMovies[i];
             const card = document.createElement('div');
-            card.className = `movie-card ${getGenreClass(movie.Genre)}`;
+
+            // Map the MacroGenre and Decade for the background image
+            const rawGenre = movie.MacroGenre || 'Drama';
+            const cleanGenre = rawGenre.toLowerCase();
+
+            let bgImage = '';
+            if (movie.Year) {
+                let decade = Math.floor(parseInt(movie.Year, 10) / 10) * 10;
+                if (decade < 1920) decade = 1920;
+                if (decade > 2020) decade = 2020;
+                bgImage = `style="background-image: linear-gradient(to top, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.75) 100%), url('assets/${cleanGenre}/${decade}/bg.png'); background-size: cover; background-position: center;"`;
+            }
+
+            card.className = `movie-card genre-${cleanGenre}`;
 
             const genreLabel = movie.Genre || 'Unknown Genre';
 
             card.innerHTML = `
+                <div class="card-bg" ${bgImage}></div>
                 <div class="category-indicator"></div>
                 <div class="card-header">
                     <div class="rank-badge">#${movie.Rank || '-'}</div>
@@ -142,7 +156,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
                 <div class="movie-note">
                     <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
-                    ${movie.Note || 'N/A'}
+                    <div class="movie-stats">
+                        ${getStatsHtml(movie)}
+                    </div>
                 </div>
             `;
             fragment.appendChild(card);
@@ -177,5 +193,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span class="stat-value">${Math.round((filteredMovies.length / allMovies.length) * 100) || 0}%</span>
             </div>
         `;
+    }
+
+    function getStatsHtml(movie) {
+        let statsHtml = '';
+        if (movie.Category === "Top 10 Box Office") {
+            statsHtml += `<div><strong>Budget:</strong> ${movie.Budget || 'N/A'}</div>`;
+            statsHtml += `<div><strong>Domestic Gross:</strong> ${movie.DomesticGross || 'N/A'}</div>`;
+            if (movie.WorldwideGross) statsHtml += `<div><strong>Worldwide:</strong> ${movie.WorldwideGross}</div>`;
+        } else if (movie.Category === "Top 10 Critically Acclaimed") {
+            statsHtml += `<div><strong>RT Score:</strong> ${movie.RTScore || 'N/A'}</div>`;
+            statsHtml += `<div><strong>Metacritic:</strong> ${movie.Metacritic || 'N/A'}</div>`;
+            statsHtml += `<div><strong>Note:</strong> ${movie.KeyRecognition || 'N/A'}</div>`;
+        } else if (movie.Category === "Top 10 Award Winning") {
+            statsHtml += `<div><strong>Oscar Wins:</strong> ${movie.OscarWins || '0'}</div>`;
+            statsHtml += `<div><strong>Oscar Noms:</strong> ${movie.OscarNoms || '0'}</div>`;
+            if (movie.OtherAwards) statsHtml += `<div><strong>Other:</strong> ${movie.OtherAwards}</div>`;
+        } else if (movie.Category === "Top 10 Cult Classics") {
+            statsHtml += `<div><strong>Current RT:</strong> ${movie.CurrentRTScore || 'N/A'}</div>`;
+            statsHtml += `<div><strong>Box Office:</strong> ${movie.OriginalBoxOffice || 'N/A'}</div>`;
+            statsHtml += `<div><strong>Note:</strong> ${movie.CultStatusReason || 'N/A'}</div>`;
+        } else {
+            // Fallback for custom or unified rows later
+            statsHtml += `<div><strong>Studio:</strong> ${movie.Studio || 'N/A'}</div>`;
+        }
+        return statsHtml;
     }
 });

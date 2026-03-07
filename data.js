@@ -1,3 +1,4 @@
+const ALL_MOVIES = 
 [
   {
     "Title": "Wings",
@@ -50609,4 +50610,4 @@
     "CultStatusReason": "Eggers' lavish reimagining became genre event",
     "MacroGenre": "Horror"
   }
-]
+];
