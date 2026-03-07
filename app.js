@@ -216,7 +216,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const card = document.createElement('div');
 
         const exactGenre = movie.Genre || 'Unknown Genre';
-        const safeGenreFolder = exactGenre.toLowerCase().replace(/[\/\\]/g, '-');
         const genreClass = getGenreClass(exactGenre);
 
         if (movie.Year) {
@@ -227,10 +226,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.style.setProperty('--exact-bg', `url('assets/${genreClass}/${decade}/bg.png')`);
         }
 
+        if (movie.Color) {
+            // Apply category-driven hex color if available
+            card.style.setProperty('--accent', movie.Color);
+        }
+
         card.className = `movie-card genre-${genreClass}`;
 
         card.innerHTML = `
-            <div class="category-indicator"></div>
+            <div class="category-indicator" ${movie.Color ? `style="background-color: ${movie.Color}"` : ''}></div>
             <div class="card-header">
                 <div class="rank-badge">#${movie.Rank || '-'}</div>
                 <div class="year-badge">${movie.Year || 'N/A'}</div>
@@ -240,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
             <p class="movie-description">${movie.Description || ''}</p>
             <div class="movie-note">
-                <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
+                <span class="movie-note-type" ${movie.Color ? `style="color: ${movie.Color}"` : ''}>${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
                 <div class="movie-stats">
                     ${getStatsHtml(movie)}
                 </div>
@@ -294,27 +298,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getStatsHtml(movie) {
+        if (!movie.Metrics || movie.Metrics.length === 0) return '';
+
         let statsHtml = '';
-        if (movie.Category === "Top 10 Box Office") {
-            statsHtml += `<div><strong>Budget:</strong> ${movie.Budget || 'N/A'}</div>`;
-            statsHtml += `<div><strong>Domestic Gross:</strong> ${movie.DomesticGross || 'N/A'}</div>`;
-            if (movie.WorldwideGross) statsHtml += `<div><strong>Worldwide:</strong> ${movie.WorldwideGross}</div>`;
-        } else if (movie.Category === "Top 10 Critically Acclaimed") {
-            statsHtml += `<div><strong>RT Score:</strong> ${movie.RTScore || 'N/A'}</div>`;
-            statsHtml += `<div><strong>Metacritic:</strong> ${movie.Metacritic || 'N/A'}</div>`;
-            statsHtml += `<div><strong>Note:</strong> ${movie.KeyRecognition || 'N/A'}</div>`;
-        } else if (movie.Category === "Top 10 Award Winning") {
-            statsHtml += `<div><strong>Oscar Wins:</strong> ${movie.OscarWins || '0'}</div>`;
-            statsHtml += `<div><strong>Oscar Noms:</strong> ${movie.OscarNoms || '0'}</div>`;
-            if (movie.OtherAwards) statsHtml += `<div><strong>Other:</strong> ${movie.OtherAwards}</div>`;
-        } else if (movie.Category === "Top 10 Cult Classics") {
-            statsHtml += `<div><strong>Current RT:</strong> ${movie.CurrentRTScore || 'N/A'}</div>`;
-            statsHtml += `<div><strong>Box Office:</strong> ${movie.OriginalBoxOffice || 'N/A'}</div>`;
-            statsHtml += `<div><strong>Note:</strong> ${movie.CultStatusReason || 'N/A'}</div>`;
-        } else {
-            // Fallback for custom or unified rows later
-            statsHtml += `<div><strong>Studio:</strong> ${movie.Studio || 'N/A'}</div>`;
-        }
+        movie.Metrics.forEach(metric => {
+            statsHtml += `<div><strong>${metric.Label}:</strong> ${metric.Value}</div>`;
+        });
+
         return statsHtml;
     }
 });
