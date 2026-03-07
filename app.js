@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const categoryInput = document.getElementById('categoryInput');
     const genreInput = document.getElementById('genreInput');
     const genreList = document.getElementById('genreList');
-    const yearInput = document.getElementById('yearInput');
+    const yearMinInput = document.getElementById('yearMinInput');
+    const yearMaxInput = document.getElementById('yearMaxInput');
     const yearList = document.getElementById('yearList');
     const sortSelect = document.getElementById('sortSelect');
     const currentCategoryText = document.getElementById('currentCategoryText');
@@ -95,7 +96,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.addEventListener('input', debouncedFilter);
     categoryInput.addEventListener('input', applyFilters);
     genreInput.addEventListener('input', applyFilters);
-    yearInput.addEventListener('input', applyFilters);
+    yearMinInput.addEventListener('input', applyFilters);
+    yearMaxInput.addEventListener('input', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
 
     function debounce(func, timeout = 300) {
@@ -110,7 +112,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const searchTerm = searchInput.value.toLowerCase().trim();
         const category = categoryInput.value.trim() || 'all';
         const genreOpt = genreInput.value.trim() || 'all';
-        const yearOpt = yearInput.value.trim() || 'all';
+
+        const minYearVal = parseInt(yearMinInput.value, 10);
+        const maxYearVal = parseInt(yearMaxInput.value, 10);
+
         const sort = sortSelect.value;
 
         filteredMovies = allMovies.filter(movie => {
@@ -127,8 +132,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             let matchesYear = true;
-            if (yearOpt !== 'all') {
-                matchesYear = String(movie.Year) === yearOpt;
+            if (movie.Year) {
+                const movieYear = parseInt(movie.Year, 10);
+                if (!isNaN(minYearVal) && movieYear < minYearVal) matchesYear = false;
+                if (!isNaN(maxYearVal) && movieYear > maxYearVal) matchesYear = false;
+            } else if (!isNaN(minYearVal) || !isNaN(maxYearVal)) {
+                // If a year filter is active but movie has no year
+                matchesYear = false;
             }
 
             return matchesSearch && matchesCategory && matchesGenre && matchesYear;

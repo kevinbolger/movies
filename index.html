@@ -42,8 +42,11 @@
                     <datalist id="genreList"></datalist>
                 </div>
                 <div class="filter-group">
-                    <label for="yearInput">Year</label>
-                    <input type="text" id="yearInput" list="yearList" placeholder="All Years">
+                    <label>Year Range</label>
+                    <div class="year-range-inputs" style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="yearMinInput" list="yearList" placeholder="From">
+                        <input type="text" id="yearMaxInput" list="yearList" placeholder="To">
+                    </div>
                     <datalist id="yearList"></datalist>
                 </div>
                 <button id="luckyBtn" class="lucky-btn">🎲 I'm Feeling Lucky</button>
@@ -84,7 +87,7 @@
     </div>
 
     <script src="data.js?v=3"></script>
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
 </body>
 
 </html>
