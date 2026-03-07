@@ -475,6 +475,91 @@ select:focus {
     transform: translateY(-2px);
 }
 
+/* I'm Feeling Lucky Button */
+.lucky-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--cat-scifi), var(--cat-action));
+    border: none;
+    color: #fff;
+    border-radius: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
+}
+
+.lucky-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(192, 132, 252, 0.5);
+    filter: brightness(1.1);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    transform: scale(0.9);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+    color: var(--accent);
+}
+
+/* Adjust the movie card when it's inside the modal */
+.modal-content .movie-card {
+    width: 100%;
+    min-height: 500px;
+    cursor: default;
+    transform: none !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
     .app-container {

@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const statsContainer = document.getElementById('statsContainer');
     const loading = document.getElementById('loading');
 
+    // Modal & Lucky Button
+    const luckyBtn = document.getElementById('luckyBtn');
+    const movieModal = document.getElementById('movieModal');
+    const modalClose = document.getElementById('modalClose');
+    const modalCardContainer = document.getElementById('modalCardContainer');
+
     // Fetch Data
     try {
         if (typeof ALL_MOVIES === 'undefined') {
@@ -55,6 +61,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error("Error loading data:", error);
         loading.textContent = "Failed to load database. Please ensure data.js exists and is linked.";
+    }
+
+    // Modal Listeners
+    if (luckyBtn) luckyBtn.addEventListener('click', showLuckyMovie);
+    if (modalClose) {
+        modalClose.addEventListener('click', () => {
+            movieModal.classList.remove('active');
+            setTimeout(() => modalCardContainer.innerHTML = '', 400);
+        });
+    }
+    if (movieModal) {
+        movieModal.addEventListener('click', (e) => {
+            if (e.target === movieModal) {
+                movieModal.classList.remove('active');
+                setTimeout(() => modalCardContainer.innerHTML = '', 400);
+            }
+        });
+    }
+
+    function showLuckyMovie() {
+        if (filteredMovies.length === 0) return;
+        const randomIdx = Math.floor(Math.random() * filteredMovies.length);
+        const movie = filteredMovies[randomIdx];
+
+        modalCardContainer.innerHTML = '';
+        modalCardContainer.appendChild(createMovieCardElement(movie));
+        movieModal.classList.add('active');
     }
 
     // Event Listeners for filters
@@ -141,6 +174,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'genre-drama';
     }
 
+    function createMovieCardElement(movie) {
+        const card = document.createElement('div');
+
+        const exactGenre = movie.Genre || 'Unknown Genre';
+        const safeGenreFolder = exactGenre.toLowerCase().replace(/[\/\\]/g, '-');
+        const genreClass = getGenreClass(exactGenre);
+
+        if (movie.Year) {
+            let decade = Math.floor(parseInt(movie.Year, 10) / 10) * 10;
+            if (decade < 1920) decade = 1920;
+            if (decade > 2020) decade = 2020;
+
+            card.style.setProperty('--exact-bg', `url('assets/${safeGenreFolder}/${decade}/bg.png')`);
+        }
+
+        card.className = `movie-card ${genreClass}`;
+
+        card.innerHTML = `
+            <div class="category-indicator"></div>
+            <div class="card-header">
+                <div class="rank-badge">#${movie.Rank || '-'}</div>
+                <div class="year-badge">${movie.Year || 'N/A'}</div>
+            </div>
+            <div class="category-tag">${exactGenre}</div>
+            <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
+            <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
+            <p class="movie-description">${movie.Description || ''}</p>
+            <div class="movie-note">
+                <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
+                <div class="movie-stats">
+                    ${getStatsHtml(movie)}
+                </div>
+            </div>
+        `;
+        return card;
+    }
+
     function renderMovies() {
         // Remove existing load more button if present
         const currentBtn = document.querySelector('.load-more-btn');
@@ -151,41 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fragment = document.createDocumentFragment();
 
         for (let i = currentlyDisplayed; i < limit; i++) {
-            const movie = filteredMovies[i];
-            const card = document.createElement('div');
-
-            const exactGenre = movie.Genre || 'Unknown Genre';
-            const safeGenreFolder = exactGenre.toLowerCase().replace(/[\/\\]/g, '-');
-            const genreClass = getGenreClass(exactGenre);
-
-            if (movie.Year) {
-                let decade = Math.floor(parseInt(movie.Year, 10) / 10) * 10;
-                if (decade < 1920) decade = 1920;
-                if (decade > 2020) decade = 2020;
-
-                card.style.setProperty('--exact-bg', `url('assets/${safeGenreFolder}/${decade}/bg.png')`);
-            }
-
-            card.className = `movie-card ${genreClass}`;
-
-            card.innerHTML = `
-                <div class="category-indicator"></div>
-                <div class="card-header">
-                    <div class="rank-badge">#${movie.Rank || '-'}</div>
-                    <div class="year-badge">${movie.Year || 'N/A'}</div>
-                </div>
-                <div class="category-tag">${exactGenre}</div>
-                <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
-                <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
-                <p class="movie-description">${movie.Description || ''}</p>
-                <div class="movie-note">
-                    <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
-                    <div class="movie-stats">
-                        ${getStatsHtml(movie)}
-                    </div>
-                </div>
-            `;
-            fragment.appendChild(card);
+            fragment.appendChild(createMovieCardElement(filteredMovies[i]));
         }
 
         movieGrid.appendChild(fragment);
