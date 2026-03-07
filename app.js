@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // DOM Elements
     const movieGrid = document.getElementById('movieGrid');
-    const searchInput = document.getElementById('searchInput');
+    const titleInput = document.getElementById('titleInput');
+    const directorInput = document.getElementById('directorInput');
     const categoryInput = document.getElementById('categoryInput');
     const genreInput = document.getElementById('genreInput');
     const genreList = document.getElementById('genreList');
@@ -93,7 +94,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event Listeners for filters
     const debouncedFilter = debounce(applyFilters, 300);
-    searchInput.addEventListener('input', debouncedFilter);
+    titleInput.addEventListener('input', debouncedFilter);
+    directorInput.addEventListener('input', debouncedFilter);
     categoryInput.addEventListener('input', applyFilters);
     genreInput.addEventListener('input', applyFilters);
     yearMinInput.addEventListener('input', applyFilters);
@@ -109,7 +111,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function applyFilters() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
+        const titleQuery = titleInput.value.toLowerCase().trim();
+        const directorQuery = directorInput.value.toLowerCase().trim();
         const category = categoryInput.value.trim() || 'all';
         const genreOpt = genreInput.value.trim() || 'all';
 
@@ -123,7 +126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const director = String(movie.Director || '').toLowerCase();
             const genreStr = String(movie.Genre || '').toLowerCase();
 
-            const matchesSearch = title.includes(searchTerm) || director.includes(searchTerm) || genreStr.includes(searchTerm);
+            const matchesTitle = titleQuery === '' || title.includes(titleQuery);
+            const matchesDirector = directorQuery === '' || director.includes(directorQuery);
             const matchesCategory = category === 'all' || movie.Category === category;
 
             let matchesGenre = true;
@@ -141,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 matchesYear = false;
             }
 
-            return matchesSearch && matchesCategory && matchesGenre && matchesYear;
+            return matchesTitle && matchesDirector && matchesCategory && matchesGenre && matchesYear;
         });
 
         // Apply Sorting
