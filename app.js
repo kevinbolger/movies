@@ -35,6 +35,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         allMovies = ALL_MOVIES;
         filteredMovies = [...allMovies];
 
+        // Populate categories dynamically
+        const categoryList = document.getElementById('categoryList');
+        const uniqueCategories = [...new Set(allMovies.map(m => m.Category).filter(Boolean))].sort();
+        uniqueCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            categoryList.appendChild(option);
+        });
+
         // Populate genres dynamically
         const uniqueGenres = new Set();
         allMovies.forEach(m => {
