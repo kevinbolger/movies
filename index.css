@@ -8,12 +8,18 @@
     --accent: #00f2fe;
     --accent-alt: #4facfe;
     --border: rgba(255, 255, 255, 0.08);
-    
-    /* Category Colors */
-    --cat-box-office: #4ade80;
-    --cat-critical: #c084fc;
-    --cat-award: #fbbf24;
-    --cat-cult: #f87171;
+
+    /* Genre Colors */
+    --cat-action: #f43f5e;
+    /* Red/Pink */
+    --cat-scifi: #0ea5e9;
+    /* Blue */
+    --cat-drama: #a855f7;
+    /* Purple */
+    --cat-horror: #10b981;
+    /* Green */
+    --cat-comedy: #f59e0b;
+    /* Orange */
 }
 
 * {
@@ -50,7 +56,7 @@ body {
     height: 100vh;
     overflow-y: auto;
     z-index: 10;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
 .logo {
@@ -88,7 +94,8 @@ body {
     letter-spacing: 1.5px;
 }
 
-input, select {
+input,
+select {
     width: 100%;
     padding: 0.9rem 1.2rem;
     background: rgba(0, 0, 0, 0.4);
@@ -101,7 +108,8 @@ input, select {
     transition: all 0.3s ease;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     border-color: var(--accent-alt);
     box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
 }
@@ -110,11 +118,13 @@ input:focus, select:focus {
 .sidebar::-webkit-scrollbar {
     width: 6px;
 }
+
 .sidebar::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
 
@@ -176,9 +186,17 @@ input:focus, select:focus {
 }
 
 @keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
 }
 
 .movie-grid {
@@ -197,7 +215,7 @@ input:focus, select:focus {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
@@ -206,7 +224,7 @@ input:focus, select:focus {
     transform: translateY(-8px) scale(1.02);
     background: var(--card-hover);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    border-color: rgba(255,255,255,0.2);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .category-indicator {
@@ -219,10 +237,45 @@ input:focus, select:focus {
     opacity: 0.8;
 }
 
-.movie-card.cat-box-office .category-indicator { background: var(--cat-box-office); box-shadow: 0 0 15px var(--cat-box-office); }
-.movie-card.cat-critically .category-indicator { background: var(--cat-critical); box-shadow: 0 0 15px var(--cat-critical); }
-.movie-card.cat-award .category-indicator { background: var(--cat-award); box-shadow: 0 0 15px var(--cat-award); }
-.movie-card.cat-cult .category-indicator { background: var(--cat-cult); box-shadow: 0 0 15px var(--cat-cult); }
+.movie-card.genre-action {
+    background: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), url('images/bg_action.png') center/cover;
+}
+
+.movie-card.genre-action:hover {
+    background: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), url('images/bg_action.png') center/cover;
+}
+
+.movie-card.genre-scifi {
+    background: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), url('images/bg_scifi.png') center/cover;
+}
+
+.movie-card.genre-scifi:hover {
+    background: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), url('images/bg_scifi.png') center/cover;
+}
+
+.movie-card.genre-drama {
+    background: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), url('images/bg_drama.png') center/cover;
+}
+
+.movie-card.genre-drama:hover {
+    background: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), url('images/bg_drama.png') center/cover;
+}
+
+.movie-card.genre-horror {
+    background: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), url('images/bg_horror.png') center/cover;
+}
+
+.movie-card.genre-horror:hover {
+    background: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), url('images/bg_horror.png') center/cover;
+}
+
+.movie-card.genre-comedy {
+    background: linear-gradient(rgba(22, 22, 26, 0.85), rgba(22, 22, 26, 0.85)), url('images/bg_comedy.png') center/cover;
+}
+
+.movie-card.genre-comedy:hover {
+    background: linear-gradient(rgba(45, 45, 52, 0.8), rgba(45, 45, 52, 0.8)), url('images/bg_comedy.png') center/cover;
+}
 
 .card-header {
     display: flex;
@@ -243,7 +296,7 @@ input:focus, select:focus {
     font-weight: 700;
     font-size: 1.3rem;
     color: var(--text-primary);
-    box-shadow: inset 0 2px 5px rgba(255,255,255,0.05);
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.05);
 }
 
 .year-badge {
@@ -268,10 +321,56 @@ input:focus, select:focus {
     align-self: flex-start;
 }
 
-.movie-card.cat-box-office .category-tag { background: rgba(74, 222, 128, 0.15); color: var(--cat-box-office); }
-.movie-card.cat-critically .category-tag { background: rgba(192, 132, 252, 0.15); color: var(--cat-critical); }
-.movie-card.cat-award .category-tag { background: rgba(251, 191, 36, 0.15); color: var(--cat-award); }
-.movie-card.cat-cult .category-tag { background: rgba(248, 113, 113, 0.15); color: var(--cat-cult); }
+.movie-card.genre-action .category-indicator {
+    background: var(--cat-action);
+    box-shadow: 0 0 15px var(--cat-action);
+}
+
+.movie-card.genre-scifi .category-indicator {
+    background: var(--cat-scifi);
+    box-shadow: 0 0 15px var(--cat-scifi);
+}
+
+.movie-card.genre-drama .category-indicator {
+    background: var(--cat-drama);
+    box-shadow: 0 0 15px var(--cat-drama);
+}
+
+.movie-card.genre-horror .category-indicator {
+    background: var(--cat-horror);
+    box-shadow: 0 0 15px var(--cat-horror);
+}
+
+.movie-card.genre-comedy .category-indicator {
+    background: var(--cat-comedy);
+    box-shadow: 0 0 15px var(--cat-comedy);
+}
+
+.movie-card.genre-action .category-tag {
+    background: rgba(74, 222, 128, 0.15);
+    color: var(--cat-action);
+}
+
+.movie-card.genre-scifi .category-tag {
+    background: rgba(192, 132, 252, 0.15);
+    color: var(--cat-scifi);
+}
+
+.movie-card.genre-drama .category-tag {
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--cat-drama);
+}
+
+.movie-card.genre-horror .category-tag {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--cat-horror);
+}
+
+.movie-card.genre-comedy .category-tag {
+    background: rgba(0, 242, 254, 0.15);
+    /* Example color for comedy */
+    color: var(--cat-comedy);
+}
 
 .movie-title {
     font-size: 1.6rem;
@@ -303,10 +402,25 @@ input:focus, select:focus {
     background: rgba(0, 0, 0, 0.5);
 }
 
-.movie-card.cat-box-office .movie-note { border-left-color: var(--cat-box-office); }
-.movie-card.cat-critically .movie-note { border-left-color: var(--cat-critical); }
-.movie-card.cat-award .movie-note { border-left-color: var(--cat-award); }
-.movie-card.cat-cult .movie-note { border-left-color: var(--cat-cult); }
+.movie-card.genre-action .movie-note {
+    border-left-color: var(--cat-action);
+}
+
+.movie-card.genre-scifi .movie-note {
+    border-left-color: var(--cat-scifi);
+}
+
+.movie-card.genre-drama .movie-note {
+    border-left-color: var(--cat-drama);
+}
+
+.movie-card.genre-horror .movie-note {
+    border-left-color: var(--cat-horror);
+}
+
+.movie-card.genre-comedy .movie-note {
+    border-left-color: var(--cat-comedy);
+}
 
 .movie-note-type {
     display: block;
@@ -346,6 +460,7 @@ input:focus, select:focus {
     .app-container {
         grid-template-columns: 280px 1fr;
     }
+
     .main-content {
         padding: 2rem;
     }
@@ -355,6 +470,7 @@ input:focus, select:focus {
     .app-container {
         grid-template-columns: 1fr;
     }
+
     .sidebar {
         height: auto;
         position: relative;
@@ -362,11 +478,13 @@ input:focus, select:focus {
         border-bottom: 1px solid var(--border);
         box-shadow: none;
     }
+
     .top-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.5rem;
     }
+
     .sort-controls select {
         width: 100%;
     }

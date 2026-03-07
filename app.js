@@ -104,12 +104,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderMovies();
     }
 
-    function getCategoryClass(category) {
-        if (!category) return '';
-        if (category.includes('Box Office')) return 'cat-box-office';
-        if (category.includes('Critically')) return 'cat-critically';
-        if (category.includes('Award')) return 'cat-award';
-        if (category.includes('Cult')) return 'cat-cult';
+    function getGenreClass(genre) {
+        if (!genre) return '';
+        const g = genre.toLowerCase();
+        if (g.includes('action')) return 'genre-action';
+        if (g.includes('sci-fi')) return 'genre-scifi';
+        if (g.includes('drama')) return 'genre-drama';
+        if (g.includes('horror')) return 'genre-horror';
+        if (g.includes('comedy')) return 'genre-comedy';
         return '';
     }
 
@@ -125,9 +127,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (let i = currentlyDisplayed; i < limit; i++) {
             const movie = filteredMovies[i];
             const card = document.createElement('div');
-            card.className = `movie-card ${getCategoryClass(movie.Category)}`;
+            card.className = `movie-card ${getGenreClass(movie.Genre)}`;
 
-            const catLabel = movie.Category ? movie.Category.replace('Top 10 ', '') : 'Unknown';
+            const genreLabel = movie.Genre || 'Unknown Genre';
 
             card.innerHTML = `
                 <div class="category-indicator"></div>
@@ -135,11 +137,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="rank-badge">#${movie.Rank || '-'}</div>
                     <div class="year-badge">${movie.Year || 'N/A'}</div>
                 </div>
-                <div class="category-tag">${catLabel}</div>
+                <div class="category-tag">${genreLabel}</div>
                 <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
                 <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
                 <div class="movie-note">
-                    <span class="movie-note-type">${movie.NoteType || 'Details'}</span>
+                    <span class="movie-note-type">${movie.Category ? movie.Category.replace('Top 10 ', '') : 'Details'}</span>
                     ${movie.Note || 'N/A'}
                 </div>
             `;
