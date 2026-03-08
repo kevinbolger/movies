@@ -243,6 +243,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function applySingleFilter(key, value) {
+        // Strip everything clean first without triggering re-renders
+        titleInput.value = '';
+        directorInput.value = '';
+        categoryInput.value = '';
+        genreInput.value = '';
+        yearMinInput.value = '';
+        yearMaxInput.value = '';
+        rankMinInput.value = '';
+        rankMaxInput.value = '';
+        minCatInput.value = '';
+        sortSelect.value = 'year-desc';
+
+        if (categoryMS) {
+            categoryMS.selectedOptions = [];
+            categoryMS.renderPills();
+            categoryMS.dropdown.classList.remove('active');
+        }
+        if (genreMS) {
+            genreMS.selectedOptions = [];
+            genreMS.renderPills();
+            genreMS.dropdown.classList.remove('active');
+        }
+
+        // Apply the specific target natively
+        if (key === 'year') {
+            yearMinInput.value = value;
+            yearMaxInput.value = value;
+        } else if (key === 'director') {
+            directorInput.value = value;
+        } else if (key === 'genre') {
+            if (genreMS) genreMS.selectOption(value, true);
+        } else if (key === 'rank') {
+            rankMinInput.value = value;
+            rankMaxInput.value = value;
+        } else if (key === 'category') {
+            if (categoryMS) categoryMS.selectOption(value, true);
+        }
+
+        // Drop the modal if we were inside it
+        if (movieModal && movieModal.classList.contains('active')) {
+            movieModal.classList.remove('active');
+        }
+
+        applyFilters();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function applyFilters() {
         const titleQuery = titleInput.value.toLowerCase().trim();
         const directorQuery = directorInput.value.toLowerCase().trim();
@@ -415,12 +463,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.innerHTML = `
             <div class="category-indicator" ${primaryData.Color ? `style="background-color: ${primaryData.Color}"` : ''}></div>
             <div class="card-header">
-                <div class="rank-badge" ${isMulti ? 'style="font-size:0.75rem; padding: 0.3rem 0.5rem;"' : ''}>${isMulti ? 'Multi' : '#' + (primaryData.Rank || '-')}</div>
-                <div class="year-badge">${movie.Year || 'N/A'}</div>
+                <div class="${!isMulti && primaryData.Rank ? 'rank-badge clickable-tag' : 'rank-badge'}" data-filter="rank" data-val="${primaryData.Rank || ''}" ${isMulti ? 'style="font-size:0.75rem; padding: 0.3rem 0.5rem;"' : ''}>${isMulti ? 'Multi' : '#' + (primaryData.Rank || '-')}</div>
+                <div class="year-badge clickable-tag" data-filter="year" data-val="${movie.Year || ''}">${movie.Year || 'N/A'}</div>
             </div>
-            <div class="category-tag">${exactGenre}</div>
+            <div class="category-tag clickable-tag" data-filter="genre" data-val="${exactGenre}">${exactGenre}</div>
             <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
-            <p class="movie-director">Directed by ${movie.Director || 'Unknown'}</p>
+            <p class="movie-director clickable-tag" data-filter="director" data-val="${movie.Director || ''}">Directed by ${movie.Director || 'Unknown'}</p>
             <p class="movie-description">${movie.Description || ''}</p>
             <div class="movie-note">
                 <span class="movie-note-type" ${primaryData.Color ? `style="color: ${primaryData.Color}"` : ''}>${isMulti ? 'Multiple Categories' : (primaryData.Category ? primaryData.Category.replace('Top 10 ', '') : 'Details')}</span>
@@ -429,6 +477,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
         `;
+
+        // Intercept clicks on specific tags to teleport filters
+        const clickables = card.querySelectorAll('.clickable-tag');
+        clickables.forEach(tag => {
+            tag.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const filter = tag.getAttribute('data-filter');
+                const val = tag.getAttribute('data-val');
+                if (filter && val && val !== 'null' && val !== 'undefined') {
+                    applySingleFilter(filter, val);
+                }
+            });
+        });
 
         return card;
     }
@@ -484,7 +545,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         movie.AggregatedData.forEach(data => {
             const isFirst = statsHtml === '';
             statsHtml += `<div style="${!isFirst ? 'margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);' : ''}">`;
-            statsHtml += `<div style="color: ${data.Color || 'var(--text-secondary)'}; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem;">${data.Category ? data.Category.replace('Top 10 ', '') : 'Details'} - Rank #${data.Rank || '-'}</div>`;
+            statsHtml += `<div class="stat-category-title clickable-tag" data-filter="category" data-val="${data.Category}" style="color: ${data.Color || 'var(--text-secondary)'}; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem;">${data.Category ? data.Category.replace('Top 10 ', '') : 'Details'} - <span data-filter="rank" data-val="${data.Rank}" class="clickable-tag">Rank #${data.Rank || '-'}</span></div>`;
 
             if (data.Metrics && data.Metrics.length > 0) {
                 data.Metrics.forEach(metric => {

@@ -205,6 +205,18 @@ select:focus {
     gap: 2rem;
 }
 
+.clickable-tag {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.clickable-tag:hover {
+    filter: brightness(1.2) contrast(1.2);
+    transform: scale(1.02);
+    text-decoration: underline;
+}
+
 .movie-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
