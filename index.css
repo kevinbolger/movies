@@ -624,6 +624,28 @@ select:focus {
     filter: brightness(1.1);
 }
 
+/* Reset Button */
+.reset-btn {
+    width: 100%;
+    margin-bottom: 2rem;
+    padding: 0.8rem;
+    background: rgba(255, 99, 132, 0.05);
+    color: rgba(255, 99, 132, 0.8);
+    border: 1px solid rgba(255, 99, 132, 0.2);
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background: rgba(255, 99, 132, 0.15);
+    color: #ff6384;
+    border-color: rgba(255, 99, 132, 0.4);
+}
+
 /* Modal Styles */
 .modal-overlay {
     position: fixed;

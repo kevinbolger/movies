@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             this.dropdown.classList.add('active');
         }
 
-        selectOption(opt) {
+        selectOption(opt, skipFilter = false) {
             if (!this.selectedOptions.includes(opt)) {
                 this.selectedOptions.push(opt);
                 this.renderPills();
@@ -67,8 +67,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Clear input text now that we have an exact pill
                 this.input.value = '';
                 this.dropdown.classList.remove('active');
-                applyFilters();
+                if (!skipFilter) applyFilters();
             }
+        }
+
+        clear() {
+            this.selectedOptions = [];
+            this.input.value = '';
+            this.renderPills();
+            this.dropdown.classList.remove('active');
         }
 
         removeOption(opt) {
@@ -110,6 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const minCatInput = document.getElementById('minCatInput');
     const sortSelect = document.getElementById('sortSelect');
     const currentCategoryText = document.getElementById('currentCategoryText');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
     const statsContainer = document.getElementById('statsContainer');
     const loading = document.getElementById('loading');
 
@@ -154,6 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         loading.style.display = 'none';
+        loadStateFromUrl();
         applyFilters();
     } catch (error) {
         console.error("Error loading data:", error);
@@ -203,6 +212,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     rankMaxInput.addEventListener('input', debouncedFilter);
     minCatInput.addEventListener('input', debouncedFilter);
     sortSelect.addEventListener('change', debouncedFilter);
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', () => {
+            titleInput.value = '';
+            directorInput.value = '';
+            categoryInput.value = '';
+            genreInput.value = '';
+            yearMinInput.value = '';
+            yearMaxInput.value = '';
+            rankMinInput.value = '';
+            rankMaxInput.value = '';
+            minCatInput.value = '';
+            sortSelect.value = 'year-desc';
+
+            if (categoryMS) categoryMS.clear();
+            if (genreMS) genreMS.clear();
+
+            window.history.replaceState({}, '', window.location.pathname);
+            localStorage.removeItem('cinematic_filters');
+            applyFilters();
+        });
+    }
 
     function debounce(func, timeout = 300) {
         let timer;
@@ -330,6 +361,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (fuzzyCategory) label += ` + "${fuzzyCategory}"`;
         currentCategoryText.textContent = label;
         updateStats();
+
+        const rMin = parseInt(rankMinInput.value, 10);
+        const rMax = parseInt(rankMaxInput.value, 10);
+        saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rMin, rMax, minCatVal, sortSelect.value, selectedCategories, selectedGenres);
 
         // Reset grid
         movieGrid.innerHTML = '';
@@ -460,6 +495,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         return statsHtml;
+    }
+
+    function loadStateFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let sourceParams = urlParams;
+
+        if (Array.from(urlParams.keys()).length === 0) {
+            const saved = localStorage.getItem('cinematic_filters');
+            if (saved) {
+                sourceParams = new URLSearchParams(saved);
+            }
+        }
+
+        if (Array.from(sourceParams.keys()).length > 0) {
+            if (sourceParams.has('title')) titleInput.value = sourceParams.get('title');
+            if (sourceParams.has('director')) directorInput.value = sourceParams.get('director');
+            if (sourceParams.has('cat_fuz')) categoryInput.value = sourceParams.get('cat_fuz');
+            if (sourceParams.has('gen_fuz')) genreInput.value = sourceParams.get('gen_fuz');
+            if (sourceParams.has('y_min')) yearMinInput.value = sourceParams.get('y_min');
+            if (sourceParams.has('y_max')) yearMaxInput.value = sourceParams.get('y_max');
+            if (sourceParams.has('r_min')) rankMinInput.value = sourceParams.get('r_min');
+            if (sourceParams.has('r_max')) rankMaxInput.value = sourceParams.get('r_max');
+            if (sourceParams.has('min_cat')) minCatInput.value = sourceParams.get('min_cat');
+            if (sourceParams.has('sort')) sortSelect.value = sourceParams.get('sort');
+
+            if (categoryMS && sourceParams.has('cats')) {
+                const cats = sourceParams.get('cats').split('|').filter(Boolean);
+                cats.forEach(c => categoryMS.selectOption(c, true));
+            }
+            if (genreMS && sourceParams.has('gens')) {
+                const gens = sourceParams.get('gens').split('|').filter(Boolean);
+                gens.forEach(g => genreMS.selectOption(g, true));
+            }
+        }
+    }
+
+    function saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rankMinVal, rankMaxVal, minCatVal, sort, selectedCategories, selectedGenres) {
+        const params = new URLSearchParams();
+        if (titleQuery) params.set('title', titleQuery);
+        if (directorQuery) params.set('director', directorQuery);
+        if (fuzzyCategory) params.set('cat_fuz', fuzzyCategory);
+        if (fuzzyGenre) params.set('gen_fuz', fuzzyGenre);
+        if (!isNaN(minYearVal)) params.set('y_min', minYearVal);
+        if (!isNaN(maxYearVal)) params.set('y_max', maxYearVal);
+        if (!isNaN(rankMinVal)) params.set('r_min', rankMinVal);
+        if (!isNaN(rankMaxVal)) params.set('r_max', rankMaxVal);
+        if (!isNaN(minCatVal)) params.set('min_cat', minCatVal);
+        if (sort && sort !== 'year-desc') params.set('sort', sort);
+
+        if (selectedCategories && selectedCategories.length > 0) {
+            params.set('cats', selectedCategories.join('|'));
+        }
+        if (selectedGenres && selectedGenres.length > 0) {
+            params.set('gens', selectedGenres.join('|'));
+        }
+
+        const qs = params.toString();
+        const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+        localStorage.setItem('cinematic_filters', qs);
     }
 
 });
