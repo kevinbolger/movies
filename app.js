@@ -569,6 +569,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
+        // Add main card click listener to open the 'I'm Feeling Lucky' / Details Modal
+        if (!isModalClone) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => {
+                clearTimeout(modalTimeout);
+                modalCardContainer.innerHTML = '';
+                modalCardContainer.appendChild(createMovieCardElement(movie, true));
+                movieModal.classList.add('active');
+            });
+        }
+
         return card;
     }
 
