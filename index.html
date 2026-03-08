@@ -70,8 +70,12 @@
                     </div>
                 </div>
                 <div class="filter-group">
-                    <label for="minCatInput">Min # of Categories</label>
-                    <input type="number" id="minCatInput" placeholder="e.g. 2 for Multi-Ranked Only" min="1" max="5">
+                    <label>Categories Won</label>
+                    <div class="range-inputs">
+                        <input type="number" id="catMinInput" placeholder="Min" min="1" max="10">
+                        <span>to</span>
+                        <input type="number" id="catMaxInput" placeholder="Max" min="1" max="10">
+                    </div>
                 </div>
 
                 <button id="resetFiltersBtn" class="reset-btn">Reset Filters</button>
@@ -113,7 +117,7 @@
     </div>
 
     <script src="data.js?v=6"></script>
-    <script src="app.js?v=27"></script>
+    <script src="app.js?v=28"></script>
 </body>
 
 </html>

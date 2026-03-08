@@ -117,7 +117,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const yearList = document.getElementById('yearList');
     const rankMinInput = document.getElementById('rankMinInput');
     const rankMaxInput = document.getElementById('rankMaxInput');
-    const minCatInput = document.getElementById('minCatInput');
+    const catMinInput = document.getElementById('catMinInput');
+    const catMaxInput = document.getElementById('catMaxInput');
     const sortSelect = document.getElementById('sortSelect');
     const currentCategoryText = document.getElementById('currentCategoryText');
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
@@ -234,7 +235,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     yearMaxInput.addEventListener('input', debouncedFilter);
     rankMinInput.addEventListener('input', debouncedFilter);
     rankMaxInput.addEventListener('input', debouncedFilter);
-    minCatInput.addEventListener('input', debouncedFilter);
+    catMinInput.addEventListener('input', debouncedFilter);
+    catMaxInput.addEventListener('input', debouncedFilter);
     sortSelect.addEventListener('change', debouncedFilter);
 
     if (resetFiltersBtn) {
@@ -247,7 +249,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             yearMaxInput.value = '';
             rankMinInput.value = '';
             rankMaxInput.value = '';
-            minCatInput.value = '';
+            catMinInput.value = '';
+            catMaxInput.value = '';
             sortSelect.value = 'year-desc';
 
             if (categoryMS) categoryMS.clear();
@@ -282,7 +285,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         yearMaxInput.value = '';
         rankMinInput.value = '';
         rankMaxInput.value = '';
-        minCatInput.value = '';
+        catMinInput.value = '';
+        catMaxInput.value = '';
         sortSelect.value = 'year-desc';
 
         if (categoryMS) {
@@ -423,11 +427,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         filteredMovies = Array.from(uniqueMoviesMap.values());
 
-        // Apply Min Categories Filter (only in normal mode)
+        // Apply Min/Max Categories Filter (only in normal mode)
         if (!isWatchlistViewActive) {
-            const minCatVal = parseInt(minCatInput.value, 10);
-            if (!isNaN(minCatVal) && minCatVal > 1) {
-                filteredMovies = filteredMovies.filter(m => m.AggregatedData && m.AggregatedData.length >= minCatVal);
+            const catMinVal = parseInt(catMinInput.value, 10);
+            const catMaxVal = parseInt(catMaxInput.value, 10);
+            if (!isNaN(catMinVal) || !isNaN(catMaxVal)) {
+                filteredMovies = filteredMovies.filter(m => {
+                    const ct = m.AggregatedData ? m.AggregatedData.length : 1;
+                    if (!isNaN(catMinVal) && ct < catMinVal) return false;
+                    if (!isNaN(catMaxVal) && ct > catMaxVal) return false;
+                    return true;
+                });
             }
         }
 
@@ -451,8 +461,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!isWatchlistViewActive) {
             const rMin = parseInt(rankMinInput.value, 10);
             const rMax = parseInt(rankMaxInput.value, 10);
-            const minCatValStr = minCatInput.value;
-            saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rMin, rMax, minCatValStr, sortSelect.value, selectedCategories, selectedGenres);
+            const catMinStr = catMinInput.value;
+            const catMaxStr = catMaxInput.value;
+            saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rMin, rMax, catMinStr, catMaxStr, sortSelect.value, selectedCategories, selectedGenres);
         }
         // Reset grid
         movieGrid.innerHTML = '';
@@ -640,7 +651,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (sourceParams.has('y_max')) yearMaxInput.value = sourceParams.get('y_max');
             if (sourceParams.has('r_min')) rankMinInput.value = sourceParams.get('r_min');
             if (sourceParams.has('r_max')) rankMaxInput.value = sourceParams.get('r_max');
-            if (sourceParams.has('min_cat')) minCatInput.value = sourceParams.get('min_cat');
+            if (sourceParams.has('cat_min')) catMinInput.value = sourceParams.get('cat_min');
+            if (sourceParams.has('cat_max')) catMaxInput.value = sourceParams.get('cat_max');
             if (sourceParams.has('sort')) sortSelect.value = sourceParams.get('sort');
 
             if (categoryMS && sourceParams.has('cats')) {
@@ -654,7 +666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rankMinVal, rankMaxVal, minCatVal, sort, selectedCategories, selectedGenres) {
+    function saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rankMinVal, rankMaxVal, catMinStr, catMaxStr, sort, selectedCategories, selectedGenres) {
         const params = new URLSearchParams();
         if (titleQuery) params.set('title', titleQuery);
         if (directorQuery) params.set('director', directorQuery);
@@ -664,7 +676,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!isNaN(maxYearVal)) params.set('y_max', maxYearVal);
         if (!isNaN(rankMinVal)) params.set('r_min', rankMinVal);
         if (!isNaN(rankMaxVal)) params.set('r_max', rankMaxVal);
-        if (!isNaN(minCatVal)) params.set('min_cat', minCatVal);
+
+        // Use explicit string checks to prevent !isNaN('') returning true for empty spaces
+        if (catMinStr && catMinStr.trim() !== '') params.set('cat_min', catMinStr);
+        if (catMaxStr && catMaxStr.trim() !== '') params.set('cat_max', catMaxStr);
+
         if (sort && sort !== 'year-desc') params.set('sort', sort);
 
         if (selectedCategories && selectedCategories.length > 0) {
