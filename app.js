@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'drama';
     }
 
-    function createMovieCardElement(movie) {
+    function createMovieCardElement(movie, isModalClone = false) {
         const card = document.createElement('div');
 
         const exactGenre = movie.Genre || 'Unknown Genre';
@@ -394,6 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
         `;
+
         return card;
     }
 
