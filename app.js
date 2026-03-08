@@ -7,47 +7,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             this.container = document.getElementById(`${idPrefix}MultiSelect`);
             this.pillsContainer = document.getElementById(`${idPrefix}Pills`);
             this.dropdown = document.getElementById(`${idPrefix}Dropdown`);
-            
+
             this.allOptions = allOptions;
             this.selectedOptions = [];
-            
+
             this.initListeners();
         }
-        
+
         initListeners() {
             // Fuzzy search on input
             this.input.addEventListener('input', () => {
                 this.renderDropdown();
                 applyFilters(); // Trigger fuzzy master filter
             });
-            
+
             // Show dropdown on focus
             this.input.addEventListener('focus', () => {
                 this.container.querySelector('.ms-search-box').classList.add('focused');
                 this.renderDropdown();
             });
-            
+
             // Hide on blur (with delay for clicks)
             this.input.addEventListener('blur', () => {
                 this.container.querySelector('.ms-search-box').classList.remove('focused');
                 setTimeout(() => this.dropdown.classList.remove('active'), 200);
             });
         }
-        
+
         renderDropdown() {
             const query = this.input.value.toLowerCase().trim();
             this.dropdown.innerHTML = '';
-            
+
             // Filter options based on fuzzy text, excluding already selected ones
-            const visibleOptions = this.allOptions.filter(opt => 
+            const visibleOptions = this.allOptions.filter(opt =>
                 opt.toLowerCase().includes(query) && !this.selectedOptions.includes(opt)
             );
-            
+
             if (visibleOptions.length === 0) {
                 this.dropdown.classList.remove('active');
                 return;
             }
-            
+
             visibleOptions.forEach(opt => {
                 const el = document.createElement('div');
                 el.className = 'ms-option';
@@ -55,28 +55,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 el.onclick = () => this.selectOption(opt);
                 this.dropdown.appendChild(el);
             });
-            
+
             this.dropdown.classList.add('active');
         }
-        
+
         selectOption(opt) {
             if (!this.selectedOptions.includes(opt)) {
                 this.selectedOptions.push(opt);
                 this.renderPills();
-                
+
                 // Clear input text now that we have an exact pill
-                this.input.value = ''; 
+                this.input.value = '';
                 this.dropdown.classList.remove('active');
                 applyFilters();
             }
         }
-        
+
         removeOption(opt) {
             this.selectedOptions = this.selectedOptions.filter(o => o !== opt);
             this.renderPills();
             applyFilters();
         }
-        
+
         renderPills() {
             this.pillsContainer.innerHTML = '';
             this.selectedOptions.forEach(opt => {
@@ -138,10 +138,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const uniqueGenres = new Set();
         allMovies.forEach(m => {
             if (m.Genre) {
-                m.Genre.split(/[\/,;&]+/).forEach(part => {
-                    const clean = part.trim();
-                    if (clean) uniqueGenres.add(clean);
-                });
+                const clean = m.Genre.trim();
+                if (clean) uniqueGenres.add(clean);
             }
         });
         const sortedGenres = [...uniqueGenres].sort();
@@ -235,12 +233,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             const matchesDirector = directorQuery === '' || director.includes(directorQuery);
 
             // Matches any of the exact Category pills AND matches active fuzzy text
-            let matchesExactCat = selectedCategories.length === 0 || selectedCategories.includes(movie.Category);
+            let matchesExactCat = selectedCategories.length === 0 || selectedCategories.some(c => movie.Category === c);
             let matchesFuzzyCat = fuzzyCategory === '' || catStr.includes(fuzzyCategory);
             const matchesCategory = matchesExactCat && matchesFuzzyCat;
 
             // Matches any of the exact Genre pills AND matches active fuzzy text
-            let matchesExactGenre = selectedGenres.length === 0 || selectedGenres.some(g => movie.Genre && movie.Genre.includes(g));
+            let matchesExactGenre = true;
+            if (selectedGenres.length > 0) {
+                if (!movie.Genre) {
+                    matchesExactGenre = false;
+                } else {
+                    matchesExactGenre = selectedGenres.some(pill => movie.Genre.trim() === pill);
+                }
+            }
+
             let matchesFuzzyGenre = fuzzyGenre === '' || genreStr.includes(fuzzyGenre);
             const matchesGenre = matchesExactGenre && matchesFuzzyGenre;
 
