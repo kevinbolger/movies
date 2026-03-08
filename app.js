@@ -445,16 +445,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return 0;
         });
 
-        // Update UI Context
-        let label = selectedCategories.length > 0 ? selectedCategories.join(', ') : 'All Categories';
-        if (fuzzyCategory) label += ` + "${fuzzyCategory}"`;
-        currentCategoryText.textContent = label;
         updateStats();
 
-        const rMin = parseInt(rankMinInput.value, 10);
-        const rMax = parseInt(rankMaxInput.value, 10);
-        saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rMin, rMax, minCatVal, sortSelect.value, selectedCategories, selectedGenres);
-
+        // Save URL State only in normal mode
+        if (!isWatchlistViewActive) {
+            const rMin = parseInt(rankMinInput.value, 10);
+            const rMax = parseInt(rankMaxInput.value, 10);
+            const minCatValStr = minCatInput.value;
+            saveStateToUrl(titleQuery, directorQuery, fuzzyCategory, fuzzyGenre, minYearVal, maxYearVal, rMin, rMax, minCatValStr, sortSelect.value, selectedCategories, selectedGenres);
+        }
         // Reset grid
         movieGrid.innerHTML = '';
         currentlyDisplayed = 0;
