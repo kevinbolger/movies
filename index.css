@@ -580,7 +580,11 @@ select:focus {
 /* I'm Feeling Lucky Button */
 .lucky-btn {
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
     padding: 1rem;
     background: linear-gradient(135deg, var(--cat-scifi), var(--cat-action));
     border: none;
