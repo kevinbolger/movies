@@ -1,7 +1,6 @@
 import pandas as pd
 import json
 import numpy as np
-import os
 
 excel_file = "/Users/kevinbolger/local/projects/movies/Top_10_Movies_By_Year_All_Categories.xlsx"
 output_file = "/Users/kevinbolger/local/projects/movies/data.js"
@@ -11,54 +10,75 @@ def clean_data(df):
     return df.replace({np.nan: None})
 
 try:
-    # Read tables (skiprows=1 gets the true headers)
-    dim_movies = pd.read_excel(excel_file, sheet_name='dim_Movies', skiprows=1)
-    dim_categories = pd.read_excel(excel_file, sheet_name='dim_Categories', skiprows=1)
-    fact_rankings = pd.read_excel(excel_file, sheet_name='fact_Rankings', skiprows=1)
+    xl = pd.ExcelFile(excel_file)
+    sheets = xl.sheet_names
 
-    # Clean empty rows
+    if 'Movies' not in sheets:
+        raise ValueError("Core 'Movies' dimension sheet not found!")
+
+    # Load core dimension (skiprows=1 gets the true headers)
+    dim_movies = pd.read_excel(excel_file, sheet_name='Movies', skiprows=1)
     dim_movies = clean_data(dim_movies.dropna(how='all'))
-    dim_categories = clean_data(dim_categories.dropna(how='all'))
-    fact_rankings = clean_data(fact_rankings.dropna(how='all'))
-
-    # Join the Fact table to both Dimension tables
-    # fact_Rankings -> dim_Movies on MovieID
-    merged = fact_rankings.merge(dim_movies, on='MovieID', how='left')
     
-    # -> dim_Categories on CategoryID
-    merged = merged.merge(dim_categories, on='CategoryID', how='left')
-
-    records = merged.to_dict(orient='records')
+    # Create lookup dict by MovieID
+    movie_lookup = {}
+    for record in dim_movies.to_dict(orient='records'):
+        mid = record.get('MovieID')
+        if mid:
+            movie_lookup[mid] = record
+            
     unified_records = []
-
-    for record in records:
-        title = record.get("Title")
-        # Ensure it has a title
-        if not title:
+    
+    # Iterate through all other sheets in the workbook
+    for sheet_name in sheets:
+        if sheet_name == 'Movies':
             continue
-
-        unified_record = {
-            "Title": title,
-            "Year": record.get("Release Year"), # The year the movie released
-            "RankYear": record.get("Year"), # The year of the category ranking
-            "Rank": record.get("Rank"),
-            "Director": record.get("Director"),
-            "Description": record.get("Description"),
-            "Genre": record.get("Genre"),
-            "Studio": record.get("Studio"),
-            "Category": record.get("Category"),
-            "Color": record.get("Color"),
-            "Metrics": []
-        }
-
-        # Dynamically append any Metric X that has both a Label and a Value
-        for i in range(1, 5):
-            label = record.get(f"Metric{i} Label")
-            val = record.get(f"Metric{i}")
-            if label is not None and val is not None:
-                unified_record["Metrics"].append({"Label": label, "Value": val})
-
-        unified_records.append(unified_record)
+            
+        print(f"Processing sheet: {sheet_name}")
+        df = pd.read_excel(excel_file, sheet_name=sheet_name, skiprows=1)
+        df = clean_data(df.dropna(how='all'))
+        
+        records = df.to_dict(orient='records')
+        
+        for fact_row in records:
+            mid = fact_row.get('MovieID')
+            if not mid:
+                continue
+                
+            dim_row = movie_lookup.get(mid, {})
+            
+            # Combine core properties
+            title = fact_row.get('Title') or dim_row.get('Title')
+            if not title:
+                continue
+                
+            unified_record = {
+                "Title": title,
+                "Year": dim_row.get("Release Year"),
+                "RankYear": fact_row.get("Year") or fact_row.get("Ceremony Year"),
+                "Rank": fact_row.get("Rank"),
+                "Director": fact_row.get("Director") or dim_row.get("Director"),
+                "Description": dim_row.get("Description"),
+                "Genre": dim_row.get("Genre"),
+                "Studio": dim_row.get("Studio"),
+                "Category": sheet_name, 
+                "Color": dim_row.get("Color"), # Doesn't exist yet but safe
+                "Metrics": []
+            }
+            
+            # Identify standard columns to ignore from Metrics
+            standard_cols = {'Year', 'Ceremony Year', 'Rank', 'MovieID', 'Title', 'Director', 'Release Year', 'Genre', 'Studio', 'Description', 'Color'}
+            
+            # Everything else is a dynamically named Metric
+            for col, val in fact_row.items():
+                if col not in standard_cols and not str(col).startswith('Unnamed:'):
+                    if val is not None:
+                        unified_record["Metrics"].append({
+                            "Label": col,
+                            "Value": val
+                        })
+            
+            unified_records.append(unified_record)
 
     # Write Javascript payload
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -71,7 +91,7 @@ try:
     with open(json_output_file, 'w', encoding='utf-8') as f:
         json.dump(unified_records, f, indent=4)
 
-    print(f"Successfully processed and cleanly joined {len(unified_records)} records from Star Schema into unified data.js")
+    print(f"Successfully processed {len(unified_records)} records from exploded sheets into unified data.js")
 
 except Exception as e:
     print(f"Error processing data: {e}")
