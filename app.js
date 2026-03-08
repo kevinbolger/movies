@@ -102,6 +102,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentlyDisplayed = 0;
     const LOAD_CHUNK = 100; // How many to render at once
 
+    let watchlist = [];
+    let isWatchlistViewActive = false;
+
     // DOM Elements
     const movieGrid = document.getElementById('movieGrid');
     const titleInput = document.getElementById('titleInput');
@@ -124,7 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Multi-select Instances
     let categoryMS, genreMS;
 
-    // Modal & Lucky Button
+    // Modal & Lucky & Watchlist Button
+    const watchlistBtn = document.getElementById('watchlistBtn');
     const luckyBtn = document.getElementById('luckyBtn');
     const movieModal = document.getElementById('movieModal');
     const modalClose = document.getElementById('modalClose');
@@ -167,6 +171,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error("Error loading data:", error);
         loading.textContent = "Failed to load database. Please ensure data.js exists and is linked.";
+    }
+
+    // Watchlist Initialization & Listeners
+    try {
+        const savedWatchlist = localStorage.getItem('cinematic_watchlist');
+        if (savedWatchlist) {
+            watchlist = JSON.parse(savedWatchlist);
+        }
+    } catch (e) { console.error('Error loading watchlist from local storage', e); }
+
+    if (watchlistBtn) {
+        watchlistBtn.addEventListener('click', () => {
+            isWatchlistViewActive = !isWatchlistViewActive;
+            if (isWatchlistViewActive) {
+                watchlistBtn.classList.add('active');
+            } else {
+                watchlistBtn.classList.remove('active');
+            }
+            applyFilters();
+        });
     }
 
     // Modal Listeners
@@ -228,6 +252,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (categoryMS) categoryMS.clear();
             if (genreMS) genreMS.clear();
+
+            if (isWatchlistViewActive) {
+                isWatchlistViewActive = false;
+                if (watchlistBtn) watchlistBtn.classList.remove('active');
+            }
 
             window.history.replaceState({}, '', window.location.pathname);
             localStorage.removeItem('cinematic_filters');
@@ -308,56 +337,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const sort = sortSelect.value;
 
-        filteredMovies = allMovies.filter(movie => {
-            const title = String(movie.Title || '').toLowerCase();
-            const director = String(movie.Director || '').toLowerCase();
-            const genreStr = String(movie.Genre || '').toLowerCase();
-            const catStr = String(movie.Category || '').toLowerCase();
+        if (isWatchlistViewActive) {
+            filteredMovies = allMovies.filter(movie => watchlist.includes(movie.Title));
+            currentCategoryText.textContent = '⭐ My Watchlist';
+        } else {
+            filteredMovies = allMovies.filter(movie => {
+                const title = String(movie.Title || '').toLowerCase();
+                const director = String(movie.Director || '').toLowerCase();
+                const genreStr = String(movie.Genre || '').toLowerCase();
+                const catStr = String(movie.Category || '').toLowerCase();
 
-            const matchesTitle = titleQuery === '' || title.includes(titleQuery);
-            const matchesDirector = directorQuery === '' || director.includes(directorQuery);
+                const matchesTitle = titleQuery === '' || title.includes(titleQuery);
+                const matchesDirector = directorQuery === '' || director.includes(directorQuery);
 
-            // Matches any of the exact Category pills AND matches active fuzzy text
-            let matchesExactCat = selectedCategories.length === 0 || selectedCategories.some(c => movie.Category === c);
-            let matchesFuzzyCat = fuzzyCategory === '' || catStr.includes(fuzzyCategory);
-            const matchesCategory = matchesExactCat && matchesFuzzyCat;
+                // Matches any of the exact Category pills AND matches active fuzzy text
+                let matchesExactCat = selectedCategories.length === 0 || selectedCategories.some(c => movie.Category === c);
+                let matchesFuzzyCat = fuzzyCategory === '' || catStr.includes(fuzzyCategory);
+                const matchesCategory = matchesExactCat && matchesFuzzyCat;
 
-            // Matches any of the exact Genre pills AND matches active fuzzy text
-            let matchesExactGenre = true;
-            if (selectedGenres.length > 0) {
-                if (!movie.Genre) {
-                    matchesExactGenre = false;
-                } else {
-                    matchesExactGenre = selectedGenres.some(pill => movie.Genre.trim() === pill);
+                // Matches any of the exact Genre pills AND matches active fuzzy text
+                let matchesExactGenre = true;
+                if (selectedGenres.length > 0) {
+                    if (!movie.Genre) {
+                        matchesExactGenre = false;
+                    } else {
+                        matchesExactGenre = selectedGenres.some(pill => movie.Genre.trim() === pill);
+                    }
                 }
-            }
 
-            let matchesFuzzyGenre = fuzzyGenre === '' || genreStr.includes(fuzzyGenre);
-            const matchesGenre = matchesExactGenre && matchesFuzzyGenre;
+                let matchesFuzzyGenre = fuzzyGenre === '' || genreStr.includes(fuzzyGenre);
+                const matchesGenre = matchesExactGenre && matchesFuzzyGenre;
 
-            let matchesYear = true;
-            if (movie.Year) {
-                const movieYear = parseInt(movie.Year, 10);
-                if (!isNaN(minYearVal) && movieYear < minYearVal) matchesYear = false;
-                if (!isNaN(maxYearVal) && movieYear > maxYearVal) matchesYear = false;
-            } else if (!isNaN(minYearVal) || !isNaN(maxYearVal)) {
-                // If a year filter is active but movie has no year
-                matchesYear = false;
-            }
+                let matchesYear = true;
+                if (movie.Year) {
+                    const movieYear = parseInt(movie.Year, 10);
+                    if (!isNaN(minYearVal) && movieYear < minYearVal) matchesYear = false;
+                    if (!isNaN(maxYearVal) && movieYear > maxYearVal) matchesYear = false;
+                } else if (!isNaN(minYearVal) || !isNaN(maxYearVal)) {
+                    // If a year filter is active but movie has no year
+                    matchesYear = false;
+                }
 
-            let matchesRank = true;
-            const minRankVal = parseInt(rankMinInput.value, 10);
-            const maxRankVal = parseInt(rankMaxInput.value, 10);
-            if (movie.Rank) {
-                const movieRank = parseInt(movie.Rank, 10);
-                if (!isNaN(minRankVal) && movieRank < minRankVal) matchesRank = false;
-                if (!isNaN(maxRankVal) && movieRank > maxRankVal) matchesRank = false;
-            } else if (!isNaN(minRankVal) || !isNaN(maxRankVal)) {
-                matchesRank = false;
-            }
+                let matchesRank = true;
+                const minRankVal = parseInt(rankMinInput.value, 10);
+                const maxRankVal = parseInt(rankMaxInput.value, 10);
+                if (movie.Rank) {
+                    const movieRank = parseInt(movie.Rank, 10);
+                    if (!isNaN(minRankVal) && movieRank < minRankVal) matchesRank = false;
+                    if (!isNaN(maxRankVal) && movieRank > maxRankVal) matchesRank = false;
+                } else if (!isNaN(minRankVal) || !isNaN(maxRankVal)) {
+                    matchesRank = false;
+                }
 
-            return matchesTitle && matchesDirector && matchesCategory && matchesGenre && matchesYear && matchesRank;
-        });
+                return matchesTitle && matchesDirector && matchesCategory && matchesGenre && matchesYear && matchesRank;
+            });
+
+            // Update UI Context for normal filters
+            let label = selectedCategories.length > 0 ? selectedCategories.join(', ') : 'All Categories';
+            if (fuzzyCategory) label += ` + "${fuzzyCategory}"`;
+            currentCategoryText.textContent = label;
+        }
 
         // Deduplicate movies by Title, grouping their Categories and Metrics
         const uniqueMoviesMap = new Map();
@@ -384,10 +423,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         filteredMovies = Array.from(uniqueMoviesMap.values());
 
-        // Apply Min Categories Filter
-        const minCatVal = parseInt(minCatInput.value, 10);
-        if (!isNaN(minCatVal) && minCatVal > 1) {
-            filteredMovies = filteredMovies.filter(m => m.AggregatedData && m.AggregatedData.length >= minCatVal);
+        // Apply Min Categories Filter (only in normal mode)
+        if (!isWatchlistViewActive) {
+            const minCatVal = parseInt(minCatInput.value, 10);
+            if (!isNaN(minCatVal) && minCatVal > 1) {
+                filteredMovies = filteredMovies.filter(m => m.AggregatedData && m.AggregatedData.length >= minCatVal);
+            }
         }
 
         // Apply Sorting
@@ -461,6 +502,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.className = `movie-card genre-${genreClass}`;
 
         card.innerHTML = `
+            <div class="watchlist-badge ${watchlist.includes(movie.Title) ? 'active' : ''}">
+                <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
+            </div>
             <div class="category-indicator" ${primaryData.Color ? `style="background-color: ${primaryData.Color}"` : ''}></div>
             <div class="card-header">
                 <div class="${!isMulti && primaryData.Rank ? 'rank-badge clickable-tag' : 'rank-badge'}" data-filter="rank" data-val="${primaryData.Rank || ''}" ${isMulti ? 'style="font-size:0.75rem; padding: 0.3rem 0.5rem;"' : ''}>${isMulti ? 'Multi' : '#' + (primaryData.Rank || '-')}</div>
@@ -490,6 +534,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
         });
+
+        // Watchlist toggle functionality
+        const watchBadge = card.querySelector('.watchlist-badge');
+        if (watchBadge) {
+            watchBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (watchlist.includes(movie.Title)) {
+                    watchlist = watchlist.filter(t => t !== movie.Title);
+                    watchBadge.classList.remove('active');
+                    if (isWatchlistViewActive) applyFilters(); // Remove instantly if in Watchlist view
+                } else {
+                    watchlist.push(movie.Title);
+                    watchBadge.classList.add('active');
+                }
+                localStorage.setItem('cinematic_watchlist', JSON.stringify(watchlist));
+            });
+        }
 
         return card;
     }

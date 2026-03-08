@@ -326,6 +326,43 @@ select:focus {
     margin-bottom: 1.2rem;
 }
 
+.watchlist-badge {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 36px;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(5px);
+}
+
+.watchlist-badge svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2;
+    transition: all 0.2s ease;
+}
+
+.watchlist-badge:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.watchlist-badge.active svg {
+    fill: var(--cat-drama);
+    stroke: var(--cat-drama);
+}
+
 .rank-badge {
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid var(--border);
@@ -656,6 +693,33 @@ select:focus {
     background: rgba(255, 99, 132, 0.15);
     color: #ff6384;
     border-color: rgba(255, 99, 132, 0.4);
+}
+
+/* Watchlist Button */
+.watchlist-btn {
+    width: 100%;
+    margin-bottom: 0.8rem;
+    padding: 1rem;
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--cat-drama);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.watchlist-btn:hover {
+    background: rgba(251, 191, 36, 0.2);
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+}
+
+.watchlist-btn.active {
+    background: var(--cat-drama);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
 }
 
 /* Modal Styles */
