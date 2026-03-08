@@ -501,13 +501,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.className = `movie-card genre-${genreClass}`;
 
         card.innerHTML = `
-            <div class="watchlist-badge ${watchlist.includes(movie.Title) ? 'active' : ''}">
-                <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
-            </div>
             <div class="category-indicator" ${primaryData.Color ? `style="background-color: ${primaryData.Color}"` : ''}></div>
             <div class="card-header">
                 <div class="${!isMulti && primaryData.Rank ? 'rank-badge clickable-tag' : 'rank-badge'}" data-filter="rank" data-val="${primaryData.Rank || ''}" ${isMulti ? 'style="font-size:0.75rem; padding: 0.3rem 0.5rem;"' : ''}>${isMulti ? 'Multi' : '#' + (primaryData.Rank || '-')}</div>
-                <div class="year-badge clickable-tag" data-filter="year" data-val="${movie.Year || ''}">${movie.Year || 'N/A'}</div>
+                <div style="display: flex; gap: 0.6rem; align-items: center;">
+                    <div class="year-badge clickable-tag" data-filter="year" data-val="${movie.Year || ''}">${movie.Year || 'N/A'}</div>
+                    <div class="watchlist-badge ${watchlist.includes(movie.Title) ? 'active' : ''}">
+                        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
+                    </div>
+                </div>
             </div>
             <div class="category-tag clickable-tag" data-filter="genre" data-val="${exactGenre}">${exactGenre}</div>
             <h3 class="movie-title">${movie.Title || 'Unknown Title'}</h3>
