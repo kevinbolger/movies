@@ -289,6 +289,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         catMaxInput.value = '';
         sortSelect.value = 'year-desc';
 
+        if (isWatchlistViewActive) {
+            isWatchlistViewActive = false;
+            if (watchlistBtn) watchlistBtn.classList.remove('active');
+        }
+
         if (categoryMS) {
             categoryMS.selectedOptions = [];
             categoryMS.renderPills();
