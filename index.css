@@ -668,6 +668,14 @@ select:focus {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+.modal-content .movie-description {
+    display: block;
+    -webkit-line-clamp: initial;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
 /* Custom Scrollbar for scrolling within the Modal Card */
 .modal-content .movie-card::-webkit-scrollbar {
     width: 6px;
