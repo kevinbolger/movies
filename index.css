@@ -660,10 +660,30 @@ select:focus {
 .modal-content .movie-card {
     width: 100%;
     min-height: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
     cursor: default;
     transform: none !important;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Custom Scrollbar for scrolling within the Modal Card */
+.modal-content .movie-card::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content .movie-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content .movie-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.modal-content .movie-card::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 /* Responsive Styles */
