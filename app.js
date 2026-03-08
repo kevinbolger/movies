@@ -161,24 +161,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Modal Listeners
+    let modalTimeout;
+
     if (luckyBtn) luckyBtn.addEventListener('click', showLuckyMovie);
     if (modalClose) {
         modalClose.addEventListener('click', () => {
             movieModal.classList.remove('active');
-            setTimeout(() => modalCardContainer.innerHTML = '', 400);
+            modalTimeout = setTimeout(() => modalCardContainer.innerHTML = '', 400);
         });
     }
     if (movieModal) {
         movieModal.addEventListener('click', (e) => {
             if (e.target === movieModal) {
                 movieModal.classList.remove('active');
-                setTimeout(() => modalCardContainer.innerHTML = '', 400);
+                modalTimeout = setTimeout(() => modalCardContainer.innerHTML = '', 400);
             }
         });
     }
 
     function showLuckyMovie() {
         if (filteredMovies.length === 0) return;
+
+        // Prevent race conditions where the user clicks quickly and the cleanup script deletes the new card
+        clearTimeout(modalTimeout);
+
         const randomIdx = Math.floor(Math.random() * filteredMovies.length);
         const movie = filteredMovies[randomIdx];
 
